@@ -1,0 +1,119 @@
+/* Stylesheet presentation for the [wtf_fu_showfiles] shortcode output. */
+#wtf_fu_show_files_output {
+    float: left;
+}
+#reorder_button_container, #reorder_button, #reorder_message, #reorder_submit_button {
+    display: block;
+    float: left;
+}
+#reorder_button_container {
+    margin-right: 15px;
+}
+#reorder_message {
+    padding-left: 30px; 
+    padding-top: 10px; 
+    padding-bottom: 30px; 
+    padding-right: 20px; 
+    font-size: 1.2em; 
+}
+.reorder-process {
+    float: right;
+    display: none;
+}
+.reorder-processing .reorder-process
+{
+    display: block;
+    width: 32px;
+    height: 32px;
+    background: url("../img/loading.gif") center no-repeat;
+    background-size: contain;
+}
+.reorder-number
+{
+    position: absolute;
+    background: black;
+    color: white;
+    font-weight: bold;  
+    font-size: 1em; 
+    float: left;
+    padding-left: 5px;
+    padding-right: 5px;
+    top: 0;
+    left: 0;
+    margin: 0px;
+    z-index: 100;
+    opacity: 0.7;  
+}
+#reorder_sortable.vertical li.list a, #reorder_sortable.vertical li.list p.pad_top_20px {   
+    float: none;
+    color: inherit;
+}
+#reorder_sortable.vertical li.list a span {
+    float: none;
+}
+li.list p.pad_top_20px {
+    position: relative;
+    top: 18px;
+    float: left;
+    margin: 0px; 
+    z-index: 100;
+}
+.pad_top_20px, li.list a span{
+    font-size:.8em; 
+}
+#sort_container, #files_container {
+    float: left;
+    width: 100%;
+    height: auto;
+    overflow: auto;
+}
+#reorder_sortable li.list a img, #files_list li.list a img
+{
+    display: block;
+    float: left;
+    position: absolute;
+    top: 0;
+    left: 0;  
+}
+#reorder_sortable, #files_list { 
+    list-style-type: none; 
+    margin: 0px; 
+    float: left; 
+}
+#reorder_sortable li.list, #files_list li.list { 
+    position: relative;
+    margin: 6px; 
+    list-style-type: none; 
+    float: left; 
+    width: 80px; 
+    height: 80px; 
+    font-size: 1em; 
+    text-align: center; 
+    overflow: hidden;
+    border: #333333;
+    border-style: outset; 
+}
+#reorder_sortable li.list audio, #files_list li.list audio
+{ 
+    width: 80px; 
+    margin:0px;
+    position: absolute;
+    bottom: 0;
+    left: 0; 
+    opacity: 0.6;
+    z-index: 200;
+}
+#reorder_sortable.vertical li.list, #files_list.vertical li.list {
+    width: 300px;  
+    height: 87px;
+    float: none;
+    overflow: inherit;
+}
+#reorder_sortable.vertical li.list audio, #files_list.vertical li.list audio {
+    width: 294px;
+    opacity: .7; 
+}
+#reorder_sortable.vertical li.list a {
+    padding-left: 50px;
+    padding-top: 30px;
+}
