@@ -15,19 +15,22 @@
  */
 function getUploadedAudioOptionsView(){
 
-    $view = '<div style="margin-top: 2px; overflow: hidden" class="audioOptionViewContainer well">';
-    $view .= ' <div class="col-md-6"> ';
-    $view .= '  <label for="">Oído Izquierdo</label>';
-    $view .= '  <input step="0.5" value=0 style="width:100%" type="number" class="l_input" type="text"> ';
-    $view .= ' </div> ';
-    $view .= ' <div class="col-md-6"> ';
-    $view .= '  <label for="">Oído Derecho</label>';
-    $view .= '  <input step="0.5" value=0 style="width:100%" type="number" class="r_input" type="text"> ';
-    $view .= ' </div> ';
-    $view .= ' <div class="col-md-12"> ';
-    $view .= '  <button title="Selecciona al menos un archivo de audio de la lista" disabled type="button" class="pull-right btn btn-info btn-md btn_process_audio"> <i class="glyphicon glyphicon-chevron-right"></i>  <span class="texto">Procesar</span>  </button> ';
-    $view .= ' </div> ';   
+    $view = '<div class="audioOptionViewContainer well">';
+    $view .= ' <div class="flex-container"> ';
+    $view .= '       <div class="input-container"> ';
+    $view .= '        <label for="">Oído Izquierdo</label>';
+    $view .= '        <input step="0.5" value=0 style="width:100%" type="number" class="l_input" type="text"> ';
+    $view .= '       </div> ';
+    $view .= '       <div class="input-container"> ';
+    $view .= '        <label for="">Oído Derecho</label>';
+    $view .= '        <input step="0.5" value=0 style="width:100%" type="number" class="r_input" type="text"> ';
+    $view .= '       </div> ';
+    $view .= '  </div>';
+    $view .= ' <div class="flex-container right-valign"> ';
+    $view .= '        <button title="Selecciona al menos un archivo de audio de la lista" disabled type="button" class="pull-right btn btn-info btn-md btn_process_audio"> <i class="glyphicon glyphicon-chevron-right"></i>  <span class="texto">Procesar</span>  </button> ';
+    $view .= ' </div>';
     $view .= '</div>';
+
 
     return $view;
 }
@@ -43,38 +46,47 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         $form_vars
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-        <div class="row fileupload-buttonbar">
-            <div class="col-lg-12">
-                 <div class="col-md-8">
+        <div class="fileupload-buttonbar">
+            <div class="flex-container btn-bar-header-container">
+                 <div class="buttons-container">
                     <!-- The fileinput-button span is used to style the file input field as button -->
-                    <span class="btn btn-success fileinput-button">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <span>Agregar archivos...</span>
-                        <input type="file" name="files[]" multiple>
-                    </span>
-                    <button type="submit" class="btn btn-primary start">
-                        <i class="glyphicon glyphicon-upload"></i>
-                        <span>Subir archivos</span>
-                    </button>
-                    <button type="reset" class="btn btn-warning cancel">
-                        <i class="glyphicon glyphicon-ban-circle"></i>
-                        <span>Cancelar subida</span>
-                    </button>
-                    <button type="button" class="btn btn-danger delete">
+                    <div class="column">
+                        <span class="btn btn-success fileinput-button">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            <span>Agregar archivos...</span>
+                            <input type="file" name="files[]" multiple>
+                        </span>
+                    </div>
+                    <div class="column">
+                        <button type="submit" class="btn btn-primary start">
+                            <i class="glyphicon glyphicon-upload"></i>
+                            <span>Subir archivos</span>
+                        </button>
+                    </div>
+                    <div class="column">
+                        <button type="reset" class="btn btn-warning cancel">
+                            <i class="glyphicon glyphicon-ban-circle"></i>
+                            <span>Cancelar subida</span>
+                        </button>
+                    </div>
+                    <div class="column">
+                        <button type="button" class="btn btn-danger delete">
                         <i class="glyphicon glyphicon-trash"></i>
                         <span>Eliminar</span>
-                    </button>
-                    <input id='chk_all_files' type="checkbox" class="toggle">
-                    <!-- The global file processing state -->
-                    <span class="fileupload-process"></span>
-                
+                        </button>
+                        <input id='chk_all_files' type="checkbox" class="toggle">
+                        <!-- The global file processing state -->
+                        <span class="fileupload-process"></span>
+                    </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="right-panel-container">
                     $audioOptionsView
                   </div>
 
             </div>
           
+                    
+       
 
             <!-- The global progress state -->
             <div class="col-lg-5 fileupload-progress fade">
@@ -87,17 +99,20 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
             </div>
         </div>
         <!-- The table listing the files available for upload/download -->
-        <table role="presentation" class="table table-striped">
+        <div >
+          <table role="presentation" class="table table-striped table-responsive">
             <thead>
                 <td>Procesar</td>
-                <td>Previsualizar</td>
+                <td class='visible-md visible-lg'>Previsualizar</td>
                 <td>Archivo</td>
                 <td>Tamaño</td>
                 <td>Acciones</td>
-                <td></td>
             </thead>
             <tbody class="files"></tbody>
-        </table>
+         </table>
+
+        </div>
+      
     </form>
     <br>
 </div>              
@@ -115,7 +130,7 @@ function getUploadJSTemplate_JC() {
     <tr class="template-upload fade">
          <td>
         </td> 
-        <td>
+        <td class='visible-md visible-lg'>
             <span class="preview"></span>
         </td>
         <td>
@@ -157,7 +172,7 @@ function getDownloadJSTemplate_JC() {
         <td style='background: rgba(0,0,0,0.02); vertical-align: middle; text-align: center;'>
             <input type="radio" name='chk_procesar'>
         </td> 
-        <td>
+        <td class='visible-md visible-lg'>
             <span class="preview">
                 {% if (file.thumbnailUrl) { %}
                     <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>

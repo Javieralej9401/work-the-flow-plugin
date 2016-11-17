@@ -87,7 +87,7 @@ var JC_AudioSettings = (function($){
             }).join();
 
             resetSelectedAudios();
-            showMessage({title: 'Audios procesados', msg: 'El audio '+ audioNames +', fue procesado exitosamente.'})
+           // showMessage({title: 'Audios procesados', msg: 'El audio '+ audioNames +', fue procesado exitosamente.'})
         })
         .fail(function() {
             $(viewNames.processAudioSettingsBtn).find('.texto').html('Procesar');
@@ -105,7 +105,7 @@ var JC_AudioSettings = (function($){
     var resetSelectedAudios = function(){
 
         $(viewNames.fileUploadForm).find('input:radio').removeAttr('checked');
-        $(viewNames.audioSettingsViewContainer).find('input').val('0');
+       // $(viewNames.audioSettingsViewContainer).find('input').val('0');
         $(viewNames.processAudioSettingsBtn).attr('disabled', 'disabled');
 
     }

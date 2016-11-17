@@ -117,3 +117,69 @@ li.list p.pad_top_20px {
     padding-left: 50px;
     padding-top: 30px;
 }
+
+
+/* Estilos adaptados (Correccion) */
+.btn-bar-header-container{
+}
+.flex-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+}
+.flex-container .column{
+    margin: 5px;
+    display: inline-block;
+}
+
+.flex-container .buttons-container{
+    flex-basis: 70%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 8px;
+}
+.flex-container .right-panel-container {
+    flex-basis: 30%;
+    flex-grow: 1;
+    min-width: 180px;
+    padding: 8px;
+}
+.flex-container .right-panel-container input {
+    max-height: 30px;
+}
+.flex-container .right-valign{
+    justify-content: flex-end;
+}
+
+.audioOptionViewContainer{
+    margin-top: 2px; 
+    overflow: hidden;
+}
+.audioOptionViewContainer .input-container{
+     width: 50%;
+     margin: 5px;
+     flex-grow: 1;
+}
+.btn{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
+@media screen and (max-width: 400px) {
+    .buttons-container{
+        width: 100%;
+
+    }
+    .buttons-container .column{
+            margin: 3px 0;
+    }
+    .buttons-container .column, .buttons-container .btn  {
+        width: inherit;
+    }
+    .flex-container .right-panel-container{
+        min-width: inherit;
+        margin: 10px;
+    }
+       
+}
