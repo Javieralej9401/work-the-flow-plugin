@@ -141,7 +141,6 @@ li.list p.pad_top_20px {
 .flex-container .right-panel-container {
     flex-basis: 30%;
     flex-grow: 1;
-    min-width: 180px;
     padding: 8px;
     display: flex;
     justify-content: center;
@@ -156,7 +155,8 @@ li.list p.pad_top_20px {
 .audioOptionViewContainer{
     margin-top: 2px; 
     overflow: hidden;
-    max-width: 60%;
+    max-width: 300px;
+    min-width: 200px;
 }
 .audioOptionViewContainer .input-container{
      width: 50%;
@@ -196,6 +196,7 @@ li.list p.pad_top_20px {
     }
     .audioOptionViewContainer{
         max-width: 100%;
+        min-width: 100%;
     }
        
 }
