@@ -47,7 +47,6 @@ function wtf_file_upload_init($) {
 
 
 
-
 (function ($) {
     'use strict';
 

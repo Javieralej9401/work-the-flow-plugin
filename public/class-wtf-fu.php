@@ -190,6 +190,7 @@ class Wtf_Fu {
               user_id bigint(20) UNSIGNED NOT NULL DEFAULT '0',
               file_name text NOT NULL DEFAULT '',
               file_path text NOT NULL DEFAULT '',
+              processed tinyint NOT NULL DEFAULT 0,
               PRIMARY KEY (ID)
             );"
           );

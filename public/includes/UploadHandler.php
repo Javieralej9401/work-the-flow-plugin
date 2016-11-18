@@ -1292,7 +1292,7 @@ class UploadHandler
         global $wpdb;
         $currentUser = wp_get_current_user();
         $tableName = $wpdb->prefix . "user_audio_files";
-        $queryRs = $wpdb->get_results( "SELECT ID, file_name 
+        $queryRs = $wpdb->get_results( "SELECT ID, file_name, processed 
                                         FROM $tableName 
                                         WHERE user_id = ". $currentUser->ID 
                                         . ' ' . $sqlFilter);
@@ -1300,7 +1300,7 @@ class UploadHandler
         
         // Se le asigna el id de los archivos.
         foreach ($userFilesData as $key => $data) {
-
+            $processed = false;
             $foundId = -1;
             /* Se encuentra el match en los registros de BD con el nombre del archivo
               (Unico por carpeta de usuario)
@@ -1313,6 +1313,7 @@ class UploadHandler
               
                 if($k){
                     $foundId = $row->ID;
+                    $processed = $row->processed;
                     break;
                 }
             }
@@ -1333,7 +1334,9 @@ class UploadHandler
             }
 
             $userFilesData[$key]->id = $foundId;
-           
+            $userFilesData[$key]->processed = (int) $processed;
+          
+
         }
 
         if ($file_name) {

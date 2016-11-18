@@ -160,6 +160,10 @@ li.list p.pad_top_20px {
      margin: 5px;
      flex-grow: 1;
 }
+.audioOptionViewContainer label{
+     font-size: 16px;
+}
+
 .btn{
     white-space: nowrap;
     overflow: hidden;
@@ -182,4 +186,9 @@ li.list p.pad_top_20px {
         margin: 10px;
     }
        
+}
+@media (min-width: 400px) and (max-width: 900px) { 
+    .audioOptionViewContainer label{
+        font-size: 90%;
+    }
 }

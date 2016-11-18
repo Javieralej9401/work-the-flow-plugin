@@ -87,11 +87,18 @@ var JC_AudioSettings = (function($){
             }).join();
 
             resetSelectedAudios();
-           // showMessage({title: 'Audios procesados', msg: 'El audio '+ audioNames +', fue procesado exitosamente.'})
+
+            $('.files').html('');
+            wtf_file_upload_init($);
+
+            if(result.debug){
+                showMessage({title: 'Audios procesados', msg: result.executedCommands.join('\n\n') })
+            }
+           
         })
         .fail(function() {
             $(viewNames.processAudioSettingsBtn).find('.texto').html('Procesar');
-            showMessage({title: 'Operación sin éxito', msg: 'No fue posible procesar el audio seleccionado. Por favor, intentalo nuevamente.'})
+            //showMessage({title: 'Operación sin éxito', msg: 'No fue posible procesar el audio seleccionado. Por favor, intentalo nuevamente.'})
         })
         
     }
@@ -116,6 +123,8 @@ var JC_AudioSettings = (function($){
     }
 
     var init = function(){
+
+       
 
         /**
          *

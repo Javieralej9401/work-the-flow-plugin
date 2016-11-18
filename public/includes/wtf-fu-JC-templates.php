@@ -170,7 +170,9 @@ function getDownloadJSTemplate_JC() {
    {% for (var i=0, file; file=o.files[i]; i++) { %}
     <tr data-id="{%=file.id%}" class="template-download fade"> 
         <td style='background: rgba(0,0,0,0.02); vertical-align: middle; text-align: center;'>
-            <input type="radio" name='chk_procesar'>
+            {% if (!file.processed) { %}
+                 <input type="radio" name='chk_procesar'>
+            {% } %}
         </td> 
         <td class='visible-md visible-lg'>
             <span class="preview">
