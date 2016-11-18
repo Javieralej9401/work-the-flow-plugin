@@ -105,7 +105,7 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
                 <th>Procesar</th>
                 <th class='visible-md visible-lg'>Previsualizar</th>
                 <th>Archivo</th>
-                <th>Tamaño</th>
+                <th class='visible-md visible-lg'>Tamaño</th>
                 <th>Acciones</th>
             </thead>
             <tbody class="files"></tbody>
@@ -137,7 +137,7 @@ function getUploadJSTemplate_JC() {
             <p class="name">{%=file.name%}</p>
             <strong class="error text-danger"></strong>
         </td>
-        <td>
+        <td class='visible-md visible-lg'>
             <p class="size">Procesando...</p>
             <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
         </td>
@@ -193,7 +193,7 @@ function getDownloadJSTemplate_JC() {
                 <div><span class="label label-danger">Error</span> {%=file.error%}</div>
             {% } %}
         </td>
-        <td>
+        <td class='visible-md visible-lg'>
             <span class="size">{%=o.formatFileSize(file.size)%}</span>
         </td>
         <td>

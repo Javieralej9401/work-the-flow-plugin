@@ -177,8 +177,11 @@ li.list p.pad_top_20px {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
 }
+.start, .cancel, .delete{
+    margin-bottom: 3px !important;
+}
+
 @media screen and (max-width: 400px) {
     .buttons-container{
         width: 100%;

@@ -349,7 +349,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
 
 
         //Simulando la ejecucion del comando final (crea un archivo .mp3 vacio)
-        file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
+        // file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
 
         // Se ejecuta la cola de comandos
         $executedCommands = self::executeCommandBatch($myCommandBatch);
@@ -363,8 +363,11 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
          */
         self::registerFinalOutput($RUTA_AUDIO_FINAL, $NOMBRE_AUDIO_FINAL);
 
-       // var_dump($executedCommands);
-
+        // var_dump($executedCommands);
+        /* 
+          Coloca el flag DEBUG en true o false para visualizar una alerta con los
+          comandos ejecutados desde la vista
+        // */
         $response = array( 'success' => true, 
                            'audioData' => [$audioFileData],
                            'executedCommands' => $executedCommands, 
