@@ -143,6 +143,8 @@ li.list p.pad_top_20px {
     flex-grow: 1;
     min-width: 180px;
     padding: 8px;
+    display: flex;
+    justify-content: center;
 }
 .flex-container .right-panel-container input {
     max-height: 30px;
@@ -154,6 +156,7 @@ li.list p.pad_top_20px {
 .audioOptionViewContainer{
     margin-top: 2px; 
     overflow: hidden;
+    max-width: 60%;
 }
 .audioOptionViewContainer .input-container{
      width: 50%;
@@ -161,7 +164,13 @@ li.list p.pad_top_20px {
      flex-grow: 1;
 }
 .audioOptionViewContainer label{
-     font-size: 16px;
+     font-size: 14px;
+}
+
+ #main-table thead th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .btn{
@@ -185,10 +194,20 @@ li.list p.pad_top_20px {
         min-width: inherit;
         margin: 10px;
     }
+    .audioOptionViewContainer{
+        max-width: 100%;
+    }
        
+}
+@media (max-width: 767px){
+    .files .name {
+        width: 60px;
+        word-wrap: break-word;
+    }
 }
 @media (min-width: 400px) and (max-width: 900px) { 
     .audioOptionViewContainer label{
         font-size: 90%;
     }
+
 }

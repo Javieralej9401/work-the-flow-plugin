@@ -100,13 +100,13 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
         </div>
         <!-- The table listing the files available for upload/download -->
         <div >
-          <table role="presentation" class="table table-striped table-responsive">
+          <table id='main-table' role="presentation" class="table table-striped table-responsive">
             <thead>
-                <td>Procesar</td>
-                <td class='visible-md visible-lg'>Previsualizar</td>
-                <td>Archivo</td>
-                <td>Tamaño</td>
-                <td>Acciones</td>
+                <th>Procesar</th>
+                <th class='visible-md visible-lg'>Previsualizar</th>
+                <th>Archivo</th>
+                <th>Tamaño</th>
+                <th>Acciones</th>
             </thead>
             <tbody class="files"></tbody>
          </table>
