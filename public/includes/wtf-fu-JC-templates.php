@@ -13,6 +13,7 @@
  * Vista HTML de las opciones aplicables para cada audio.
  *
  */
+
 function getUploadedAudioOptionsView(){
 
     $view = '<div class="audioOptionViewContainer well">';
@@ -64,7 +65,7 @@ function getLoaderContainerView(){
      $view .= '               <i class="glyphicon glyphicon-repeat spin">';
      $view .= '               </i>';
      $view .= '               <br>';
-     $view .= '              Procesando';
+     $view .= '              Procesando tu sonido';
      $view .= '           </div>';
      $view .= '     </div>';
 
