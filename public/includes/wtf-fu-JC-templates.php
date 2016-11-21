@@ -13,6 +13,7 @@
  * Vista HTML de las opciones aplicables para cada audio.
  *
  */
+
 function getUploadedAudioOptionsView(){
 
     $view = '<div class="audioOptionViewContainer well">';
