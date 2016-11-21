@@ -36,6 +36,7 @@ require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-show-files-shor
 require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-fileupload_JC-shortcode.php' );
 require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-process_audio_JC-shortcode.php' );
 require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-show_processed_audios_JC-shortcode.php' );
+require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-freq_generator_JC-shortcode.php' );
 
 
 
@@ -122,10 +123,8 @@ class Wtf_Fu {
         add_shortcode('wtf_fu_upload_audio', array($this, 'file_upload_JC_shortcode'));
         add_shortcode('wtf_fu_process_audio', array($this, 'process_audio_JC_shortcode'));
         add_shortcode('wtf_fu_show_processed_audios', array($this, 'show_processed_audio_JC_shortcode'));
+        add_shortcode('wtf_fu_frequency_generator', array($this, 'show_frequency_generator_JC_shortcode'));
     
- 
-       
-
     }
 
 
@@ -425,7 +424,8 @@ class Wtf_Fu {
             wp_enqueue_style($this->plugin_slug . '-bluimp-gallery-style', wtf_fu_JQUERY_FILE_UPLOAD_DEPENDS_URL . 'css/blueimp-gallery.min.css', array(), self::VERSION);
             wp_enqueue_style($this->plugin_slug . '-jquery-fileupload-style', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'css/jquery.fileupload.css', array(), self::VERSION);
             wp_enqueue_style($this->plugin_slug . '-jquery-fileupload-ui-style', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'css/jquery.fileupload-ui.css', array(), self::VERSION);
-            
+            wp_enqueue_style("jquery-ui-css", plugin_dir_url(__FILE__) . 'assets/js/jquery-ui.min.css', array(), Wtf_Fu::VERSION);
+          
             $plugin_options = Wtf_Fu_Options::get_plugin_options();
             if (wtf_fu_get_value($plugin_options, 'include_plugin_style') == true) {
                 wp_enqueue_style($this->plugin_slug . '-tbs-styles', plugin_dir_url( __FILE__ ) . '/assets/css/bootstrap.css', array(), Wtf_Fu::VERSION);
@@ -438,7 +438,7 @@ class Wtf_Fu {
 
         $audioShortCodesFilter =   array("wtf_fu_upload_audio" => "", 
                                         "wtf_fu_process_audio" => "no-processed",  
-                                        "wtf_fu_show_processed_audios" => "processed"
+                                        "wtf_fu_frecuency_generator" => "processed"
                                         );
         $audioFilter =  "";
         foreach ($audioShortCodesFilter as $key => $value) {
@@ -490,6 +490,10 @@ class Wtf_Fu {
 
             wp_enqueue_script($this->plugin_slug . '-jquery-fileupload-validate-js', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'js/jquery.fileupload-validate.js', array('jquery'), self::VERSION, true);
             wp_enqueue_script($this->plugin_slug . '-jquery-fileupload-ui-js', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'js/jquery.fileupload-ui.js', array('jquery'), self::VERSION, true);
+            wp_enqueue_script("jquery-ui", plugin_dir_url(__FILE__) . 'assets/js/jquery-ui.min.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
+          
+            wp_enqueue_script("frequency-generator-mini", plugin_dir_url(__FILE__) . 'assets/js/frequency-generator-mini.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
+               
 
 
             //<!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
@@ -594,6 +598,12 @@ class Wtf_Fu {
       
         return $content;
     }
+    function show_frequency_generator_JC_shortcode($attr){
+        $shortcode_instance = new Wtf_Fu_FrequencyGenerator_JC_Shortcode($attr);
+        $content = $shortcode_instance->generate_content();
+        return $content;
+    }
+    
 
     /**
      * Wrapper that delegates the file upload ajax action hook to static method

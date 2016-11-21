@@ -34,8 +34,11 @@ function getUploadedAudioOptionsView(){
 
     return $view;
 }
-function getMainAudioTableView($admin = true, $processFiles = true){
+function getMainAudioTableView($admin = true, $processFiles = true, $title=""){
     $view = '';
+    if($title !==""){
+     $view .= ' <h2 class="audioTitle">'.$title.'</h2>';
+    }
     $view .= '<table id="main-table" role="presentation" class="table table-striped table-responsive">';
     $view .= '   <thead>';
     if( $processFiles){
@@ -70,7 +73,7 @@ function getLoaderContainerView(){
 function get_file_upload_form_JC($action_href, $form_vars ) {
 
     $audioOptionsView = getUploadedAudioOptionsView();
-    $mainTableView = getMainAudioTableView();
+    $mainTableView = getMainAudioTableView(true, true);
     $loaderContainerView =  getLoaderContainerView();
 
             $html = <<<EOUPLOADFILESHTML
@@ -149,7 +152,9 @@ function getProcessAudioForm($action_href, $form_vars, $formId, $audioFilter = "
     if(!$processFiles){
         $audioOptionsView = '';
     }
-    $mainTableView = getMainAudioTableView($admin, $processFiles);
+    $title = $processFiles ? "Sonidos no procesados" :  "Sonidos procesados";
+
+    $mainTableView = getMainAudioTableView($admin, $processFiles, $title);
     $loaderContainerView =  getLoaderContainerView();
     $html = <<<MAINPROCESSAUDIOFORM
     <div class="panel-body tbs">
@@ -225,7 +230,7 @@ function getDownloadJSTemplate_JC($admin = true, $processFiles = true, $tmpId = 
 <!-- The template to display files available for download -->
 <script id="'.$tmpId.'" type="text/x-tmpl">
    {% for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr data-id="{%=file.id%}" class="'.$tmpId.'" fade">
+    <tr data-id="{%=file.id%}" class="'.$tmpId.' template-download" fade">
     ';
 if($processFiles){
     $script .= '
@@ -297,5 +302,41 @@ function getLoadingStateView() {
     </div>
 </script>
 LoadingStateContainer;
+    return $script;
+}
+
+function getFrequencyGeneratorView(){
+ $script = <<<FrequencyGenerator
+    <div  class="freqGenContainer">
+            <button class="button" id="play-button" title="Play/Stop [Space]" onclick="freqGen.onPlayButtonClick()">Play</button>
+            <span id="play-indicator" class="stopped"></span>
+
+            <div id="slider" style="margin: 40px 0px 18px 0px" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 44.1155%;"></div><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" style="left: 44.1155%;"></span></div>
+            <div class="controls">
+                <span class="control-group">
+                    <label id="volume-slider-label"></label>    
+                    <span id="volume-slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 100%;"></div><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" style="left: 100%;"></span></span>
+                    <span id="volume-readout">100%</span>
+                    <span class="separator"></span>
+                </span>
+                <span class="control-group">
+                    <button class="octave-button" id="octave-down-button" title="− 1 octave (frequency ÷ 2)" style="margin-right: 10px">×½</button>
+                    <button class="freq-button" id="freq-down-button" title="– 1 Hz [Shift+←]"></button>
+                    <span id="freq-readout"><small></small>404<small> Hz</small></span>
+                    <button class="freq-button" id="freq-up-button" title="+ 1 Hz [Shift+→]"></button>
+                    <button class="octave-button" id="octave-up-button" title="+ 1 octave (frequency × 2)" style="margin-left: 10px;">×2</button>
+                    <span class="separator"></span>
+                </span>
+                <span class="control-group">
+                    <label id="note-selector-label"></label>
+                    <button name="note-selector" id="note-selector" style="width: 110px; margin-right: 20px;" class="">~ G♯4 / A♭4</button>     
+                    <button style="display:none" name="get-link" id="get-link">Get link</button>
+                </span>
+            </div>
+
+     </div>
+
+ 
+FrequencyGenerator;
     return $script;
 }
