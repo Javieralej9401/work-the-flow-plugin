@@ -62,7 +62,7 @@ function getLoaderContainerView(){
      $view .= '               <i class="glyphicon glyphicon-repeat spin">';
      $view .= '               </i>';
      $view .= '               <br>';
-     $view .= '              Procesando';
+     $view .= '              Procesando tu sonido';
      $view .= '           </div>';
      $view .= '     </div>';
 

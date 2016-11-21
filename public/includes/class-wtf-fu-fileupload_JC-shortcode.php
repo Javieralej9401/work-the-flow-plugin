@@ -289,10 +289,18 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
         /*===== Estructura de la cola de comandos ====*/
 
           //variables de Ejemplo
-        $out1 = $ruta_carpeta_temp.'/'. self::generateFileName($preProcessingData['audioFileData']->file_name,
-                                                              'L_');
-        $out2 = $ruta_carpeta_temp.'/'. self::generateFileName($preProcessingData['audioFileData']->file_name,
-                                                               'R_');
+        $out1 = $ruta_carpeta_temp.'/'. self::generateFileName(
+                                                              'out1',
+                                                              '',
+                                                              '',
+                                                              '.wav'
+                                                              );
+        $out2 = $ruta_carpeta_temp.'/'. self::generateFileName(
+                                                              'out2',
+                                                              '',
+                                                              '',
+                                                              '.wav'
+                                                               );
 
         $myCommandBatch = array(
               array(
@@ -322,7 +330,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 ) 
               ),
               array(
-                'commandTemplate' => 'sox --combine merge [AUDIO_ENTRADA1] [AUDIO_ENTRADA2] [AUDIO_SALIDA]', 
+                'commandTemplate' => 'sox --combine merge [AUDIO_ENTRADA1] -C 320 [AUDIO_ENTRADA2] [AUDIO_SALIDA]', 
                 'commandTemplateVariables' => array(
                   '[AUDIO_ENTRADA1]',
                   '[AUDIO_ENTRADA2]',
@@ -331,20 +339,20 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 'commandTemplateArguments' => array(
                   $out1, 
                   $out2, 
-                  $ruta_carpeta_temp.'/'.'mixed.mp3'
+                  $RUTA_AUDIO_FINAL
                 ) 
               ),
-              array(
-                'commandTemplate' => 'sox [PARAM1] -C 320 [AUDIO_SALIDA]', 
-                'commandTemplateVariables' => array(
-                  '[PARAM1]',
-                  '[AUDIO_SALIDA]',
-                ), 
-                'commandTemplateArguments' => array(
-                  $ruta_carpeta_temp.'/'.'mixed.mp3',
-                  $RUTA_AUDIO_FINAL, // El audio final debe estar en la carpeta  de subidas del usuario
-                ) 
-              ),
+              // array(
+              //   'commandTemplate' => 'sox [PARAM1] -C 320 [AUDIO_SALIDA]', 
+              //   'commandTemplateVariables' => array(
+              //     '[PARAM1]',
+              //     '[AUDIO_SALIDA]',
+              //   ), 
+              //   'commandTemplateArguments' => array(
+              //     $ruta_carpeta_temp.'/'.'mixed.mp3',
+              //     $RUTA_AUDIO_FINAL, // El audio final debe estar en la carpeta  de subidas del usuario
+              //   ) 
+              // ),
               array(
                 'commandTemplate' => 'sox [AUDIO_SALIDA] -n spectrogram -c [PARAM1]  -o [PARAM2]', 
                 'commandTemplateVariables' => array(
