@@ -50,10 +50,10 @@ class Wtf_Fu_ProcessAudio_JC_Shortcode extends Wtf_Fu_Fileupload_JC_Shortcode {
 
       $action_href = admin_url() . 'admin-ajax.php';
 
-      $html = getProcessAudioForm($action_href, $form_vars, false)
+      $html = getProcessAudioForm($action_href, $form_vars, "process_audioForm", "no-processed", false, true, "audioTemplate")
       . getGalleryWidgetTemplate()
-      . getUploadJSTemplate_JC(false)
-      . getDownloadJSTemplate_JC(false)
+      . getUploadJSTemplate_JC(false, true)
+      . getDownloadJSTemplate_JC(false, true, "audioTemplate")
       . getLoadingStateView();
 
        return ($html);

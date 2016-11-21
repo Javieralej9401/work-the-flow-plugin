@@ -434,6 +434,31 @@ class Wtf_Fu {
         }
     }
 
+    public function getAudioFilter(){
+
+        $audioShortCodesFilter =   array("wtf_fu_upload_audio" => "", 
+                                        "wtf_fu_process_audio" => "no-processed",  
+                                        "wtf_fu_show_processed_audios" => "processed"
+                                        );
+        $audioFilter =  "";
+        foreach ($audioShortCodesFilter as $key => $value) {
+             if(self::wtf_fu_has_shortcode($key) ) {
+
+
+                if( ($value === "") || 
+                    ($value === "processed" && $audioFilter === "no-processed" ) ||  
+                    ($value === "no-processed" && $audioFilter === "processed" ) ) {
+
+                    $audioFilter =  "";
+                    break;
+               }
+
+               $audioFilter = $value;
+             }
+        }
+        return $audioFilter;
+    }
+
     /**
      * Register and enqueues public-facing JavaScript files.
      */
@@ -489,23 +514,8 @@ class Wtf_Fu {
            
             $fileupload_handle = $this->plugin_slug . '-file-upload';
 
-            $audioShortCodesFilter =   array("wtf_fu_upload_audio" => "", 
-                                            "wtf_fu_process_audio" => "no-processed",  
-                                            "wtf_fu_show_processed_audios" => "processed"
-                                            );
-            
-            $audioFilter =  "";
-            foreach ($audioShortCodesFilter as $key => $value) {
-                 if(self::wtf_fu_has_shortcode($key) && $value === ""){
-                        return;
-                 }
-                
-                 $audioFilter = ($value === "processed" && $audioFilter === "no-processed" )
-                                 ||   ($value === "no-processed" && $audioFilter === "processed" )        
-                                 ? "" :  $value;
-
-            }
            
+            $audioFilter = $this->getAudioFilter();
 
             if (!wp_script_is($fileupload_handle, 'enqueued')) {
                 //log_me('class-wtf-fu registering and enqueuing ' . $fileupload_handle);

@@ -1,58 +1,79 @@
-function wtf_file_upload_init($) {
-    console.log(WtfFuAjaxVars);
+function wtf_file_upload_init($, el) {
     
-    if ($("#fileupload").length === 0) {
+   
+
+    
+    if ($(el).length === 0) {
         return; // nothing to do.
     } 
-
-    console.log('wtf_init activation.');
+    templateID = $(el).data("template-id") || "template-download";
+    
+    //console.log('wtf_init activation.');
        
     // Capture form data fields to pass on to ajax request as POST vars.
-    var WtfFuUploadFormData = $("#fileupload").serializeArray();
-    
+    var WtfFuUploadFormData = $(el).serializeArray();
+   
     // add in the nonce to the request data.
     // WtfFuUploadFormData.push({name : "security", value : WtfFuAjaxVars.security}); 
     
     // console.log(WtfFuUploadFormData);
     // Initialize the jQuery File Upload widget:
-    $('#fileupload').fileupload({
+    $(el).fileupload({
         // Uncomment the following to send cross-domain cookies:
         //xhrFields: {withCredentials: true},
-        url: WtfFuAjaxVars.url
+        url: WtfFuAjaxVars.url,
+        downloadTemplateId: templateID,
     });
 
     // Enable iframe cross-domain access via redirect option:
-    $('#fileupload').fileupload(
+    $(el).fileupload(
         'option',
         'redirect',
         WtfFuAjaxVars.absoluteurl
     );
 
     // Load spinners.
-    $('#fileupload').addClass('fileupload-processing');
+    $(el).addClass('fileupload-processing');
  
     $.ajax({
        url: WtfFuAjaxVars.url, 
        data: WtfFuUploadFormData, 
        dataType: 'json',
-       context: $('#fileupload')[0]
+       context: $(el)[0]
     }).always(function () {
         $(this).removeClass('fileupload-processing');
     }).done(function (result) {
 
         $(this).fileupload('option', 'done')
             .call(this, $.Event('done'), {result: result});
+
+        // var $tbody = $(this).find(".files");
+
+        // result.files.map(function(e, i){
+        //         console.log(e);
+        // })
+
     });    
+
     
 } //end wtf_init
-
 
 
 (function ($) {
     'use strict';
 
-// call at load time.
-wtf_file_upload_init($);
+    var $forms = $(".fileUpload");
+
+    $forms.each(function(index, el) {
+         var id =  $(el).attr("id");
+
+         if( $("#" + id).length ){
+            // call at load time.
+            wtf_file_upload_init($, $("#" + id));
+         }
+
+    });
+
 
 })(jQuery);
 

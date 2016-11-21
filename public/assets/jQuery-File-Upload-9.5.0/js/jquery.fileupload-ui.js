@@ -470,6 +470,7 @@
             if (!func) {
                 return $();
             }
+
             var result = func({
                 files: files,
                 formatFileSize: this._formatFileSize,
@@ -478,6 +479,7 @@
             if (result instanceof $) {
                 return result;
             }
+
             return $(this.options.templatesContainer).html(result).children();
         },
 
@@ -641,6 +643,7 @@
             options.templatesContainer = this.document[0].createElement(
                 options.filesContainer.prop('nodeName')
             );
+
             if (tmpl) {
                 if (options.uploadTemplateId) {
                     options.uploadTemplate = tmpl(options.uploadTemplateId);
@@ -649,6 +652,8 @@
                     options.downloadTemplate = tmpl(options.downloadTemplateId);
                 }
             }
+            
+
         },
 
         _initFilesContainer: function () {

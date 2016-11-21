@@ -5,11 +5,11 @@ var JC_AudioSettings = (function($){
      * variables de vista
      *
      */
-    
+   
     var viewNames = {
        fileUploadForm: '.jc_FileUploadForm',
        uploadFilesBar: '.jc_FileUploadForm .fileupload-buttonbar',
-       audioTableRow: '.files .template-download',
+       audioTableRow: '.files  tr',
        processAudioSettingsBtn : '.btn_process_audio',
        audioSettingsViewContainer: '.audioOptionViewContainer',
        loadingStateView:  '.loadingStateContainer'
@@ -60,7 +60,7 @@ var JC_AudioSettings = (function($){
      * Guarda y aplica los cambios realizados a los audios seleccionados
      *
      */
-    var applySettings = function(){
+    var applySettings = function(form){
 
         var audioSettings = getAudioSettingsData();
         var selectedAudioRows  = getSelectedAudiosData();
@@ -89,8 +89,8 @@ var JC_AudioSettings = (function($){
 
             resetSelectedAudios();
 
-            $('.files').html('');
-            wtf_file_upload_init($);
+            form.find(".files").html('');
+            wtf_file_upload_init($,  form);
 
             if(result.debug){
                 showMessage({title: 'Audios procesados', msg: result.executedCommands.join('\n\n') })
@@ -125,7 +125,6 @@ var JC_AudioSettings = (function($){
 
     var init = function(){
 
-       
 
         /**
          *
@@ -145,8 +144,14 @@ var JC_AudioSettings = (function($){
 
                     return;
                 }
-          
-                applySettings();
+
+                //Busca el la tabla de audios procesados o la tabla para mostrar todos.
+                $processedClosestForm =   $(viewNames.fileUploadForm).filter(function() {
+                                            return $.inArray($(this).data("audio-filter"), 
+                                                    ["", "processed"]) > -1;
+                                          });
+
+                applySettings($processedClosestForm);
               
             }else{
                 showMessage({title: 'Ningún audio seleccionado', msg: 'Por favor selecciona al menos un audio de la lista.'})

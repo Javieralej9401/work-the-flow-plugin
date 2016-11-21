@@ -50,12 +50,11 @@ class Wtf_Fu_ShowProcessedAudios_JC_Shortcode  extends Wtf_Fu_Fileupload_JC_Shor
 
       $action_href = admin_url() . 'admin-ajax.php';
 
-      $html = getProcessAudioForm($action_href, $form_vars, true, false)
+      $html = getProcessAudioForm($action_href, $form_vars, "processed_audiosForm", "processed", true, false, "processedAudioTmp")
       . getGalleryWidgetTemplate()
-      . getUploadJSTemplate_JC(true, false)
-      . getDownloadJSTemplate_JC(true, false)
-      . getLoadingStateView();
-
+     // . getUploadJSTemplate_JC(true, false)
+      . getDownloadJSTemplate_JC(true, false, "processedAudioTmp");
+   
        return ($html);
     }
     public static function wtf_fu_load_ajax_function(){

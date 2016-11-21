@@ -76,7 +76,7 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
             $html = <<<EOUPLOADFILESHTML
 <div class="panel-body tbs">
     <!-- The file upload form used as target for the file upload widget -->
-    <form id="fileupload" class='jc_FileUploadForm' action="$action_href" method="POST" enctype="multipart/form-data">
+    <form id="fileUpload" data-audio-filter="" class='fileUpload jc_FileUploadForm' action="$action_href" method="POST" enctype="multipart/form-data">
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         $form_vars
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -142,19 +142,19 @@ EOUPLOADFILESHTML;
             return $html;
 }
 
-function getProcessAudioForm($action_href, $form_vars, $admin = true, $processFiles = true) {
+function getProcessAudioForm($action_href, $form_vars, $formId, $audioFilter = "",  $admin = true, $processFiles = true, $tmpId = "template-download") {
 
     $audioOptionsView = " <div class='right-panel-container' style='display:flex; justify-content:center'>" .
                              getUploadedAudioOptionsView() . "</div>";
     if(!$processFiles){
         $audioOptionsView = '';
     }
-    $mainTableView = getMainAudioTableView($admin , $processFiles);
+    $mainTableView = getMainAudioTableView($admin, $processFiles);
     $loaderContainerView =  getLoaderContainerView();
     $html = <<<MAINPROCESSAUDIOFORM
     <div class="panel-body tbs">
         <!-- The file upload form used as target for the file upload widget -->
-        <form id="fileupload" class='jc_FileUploadForm' action="$action_href" method="POST" enctype="multipart/form-data">
+        <form data-template-id="$tmpId" id= "$formId" data-audio-filter="$audioFilter" class='fileUpload jc_FileUploadForm' action="$action_href" method="POST" enctype="multipart/form-data">
             <!-- Redirect browsers with JavaScript disabled to the origin page -->
             $form_vars
 
@@ -220,12 +220,12 @@ if($processFiles){
 }
 
 
-function getDownloadJSTemplate_JC($admin = true, $processFiles = true) {
+function getDownloadJSTemplate_JC($admin = true, $processFiles = true, $tmpId = "template-download") {
     $script = '
 <!-- The template to display files available for download -->
-<script id="template-download" type="text/x-tmpl">
+<script id="'.$tmpId.'" type="text/x-tmpl">
    {% for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr data-id="{%=file.id%}" class="template-download fade">
+    <tr data-id="{%=file.id%}" class="'.$tmpId.'" fade">
     ';
 if($processFiles){
     $script .= '
@@ -285,8 +285,6 @@ $script .=  '   </tr>
 </script>';
     return $script;
 }
-
-
 
 function getLoadingStateView() {
     $script = <<<LoadingStateContainer
