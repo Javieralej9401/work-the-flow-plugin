@@ -34,10 +34,44 @@ function getUploadedAudioOptionsView(){
 
     return $view;
 }
+function getMainAudioTableView($admin = true, $processFiles = true){
+    $view = '';
+    $view .= '<table id="main-table" role="presentation" class="table table-striped table-responsive">';
+    $view .= '   <thead>';
+    if( $processFiles){
+    $view .= '        <th>Procesar</th>';
+    }
+    $view .= '        <th class="hidden-small">Previsualizar</th>';
+    $view .= '        <th>Archivo</th>';
+    $view .= '        <th class="hidden-small">Tamaño</th>';
+    if($admin){
+    $view .= '        <th>Acciones</th>';
+    }
+    $view .= '   </thead>';
+    $view .= '   <tbody class="files"></tbody>';
+    $view .= '</table>';
 
+    return $view;
+}
+
+
+function getLoaderContainerView(){
+     $view = '    <div class="loadingStateContainer">';
+     $view .= '           <div class="loaderContainer">';
+     $view .= '               <i class="glyphicon glyphicon-repeat spin">';
+     $view .= '               </i>';
+     $view .= '               <br>';
+     $view .= '              Procesando';
+     $view .= '           </div>';
+     $view .= '     </div>';
+
+     return $view;
+}
 function get_file_upload_form_JC($action_href, $form_vars ) {
 
     $audioOptionsView = getUploadedAudioOptionsView();
+    $mainTableView = getMainAudioTableView();
+    $loaderContainerView =  getLoaderContainerView();
 
             $html = <<<EOUPLOADFILESHTML
 <div class="panel-body tbs">
@@ -84,9 +118,9 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
                   </div>
 
             </div>
-          
-                    
-       
+
+
+
 
             <!-- The global progress state -->
             <div class="col-lg-5 fileupload-progress fade">
@@ -99,82 +133,111 @@ function get_file_upload_form_JC($action_href, $form_vars ) {
             </div>
         </div>
         <!-- The table listing the files available for upload/download -->
-        <div >
-          <table id='main-table' role="presentation" class="table table-striped table-responsive">
-            <thead>
-                <th>Procesar</th>
-                <th class='visible-md visible-lg'>Previsualizar</th>
-                <th>Archivo</th>
-                <th class='visible-md visible-lg'>Tamaño</th>
-                <th>Acciones</th>
-            </thead>
-            <tbody class="files"></tbody>
-         </table>
-
-        </div>
-      
+        $mainTableView
+        $loaderContainerView
     </form>
     <br>
-</div>              
+</div>
 EOUPLOADFILESHTML;
             return $html;
 }
 
+function getProcessAudioForm($action_href, $form_vars, $admin = true, $processFiles = true) {
 
+    $audioOptionsView = " <div class='right-panel-container' style='display:flex; justify-content:center'>" .
+                             getUploadedAudioOptionsView() . "</div>";
+    if(!$processFiles){
+        $audioOptionsView = '';
+    }
+    $mainTableView = getMainAudioTableView($admin , $processFiles);
+    $loaderContainerView =  getLoaderContainerView();
+    $html = <<<MAINPROCESSAUDIOFORM
+    <div class="panel-body tbs">
+        <!-- The file upload form used as target for the file upload widget -->
+        <form id="fileupload" class='jc_FileUploadForm' action="$action_href" method="POST" enctype="multipart/form-data">
+            <!-- Redirect browsers with JavaScript disabled to the origin page -->
+            $form_vars
 
-function getUploadJSTemplate_JC() {
-    $script = <<<UPLOADJSTEMPLATE
-<!-- The template to display files available for upload -->
-<script id="template-upload" type="text/x-tmpl">
-{% for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr class="template-upload fade">
-         <td>
-        </td> 
-        <td class='visible-md visible-lg'>
-            <span class="preview"></span>
-        </td>
-        <td>
-            <p class="name">{%=file.name%}</p>
-            <strong class="error text-danger"></strong>
-        </td>
-        <td class='visible-md visible-lg'>
-            <p class="size">Procesando...</p>
-            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
-        </td>
-        <td>
-            {% if (!i && !o.options.autoUpload) { %}
-                <button class="btn btn-primary start" disabled>
-                    <i class="glyphicon glyphicon-upload"></i>
-                    <span>Comenzar</span>
-                </button>
-            {% } %}
-            {% if (!i) { %}
-                <button class="btn btn-warning cancel">
-                    <i class="glyphicon glyphicon-ban-circle"></i>
-                    <span>Cancelar</span>
-                </button>
-            {% } %}
-        </td>
-    </tr>
-{% } %}
-</script>
+            $audioOptionsView
+           
+            <!-- The table listing the files available for upload/download -->
+            $mainTableView
+            $loaderContainerView
+        </form>
+        <br>
+    </div>
+MAINPROCESSAUDIOFORM;
+            return $html;
+}
 
-UPLOADJSTEMPLATE;
+function getUploadJSTemplate_JC($admin = true, $processFiles = true) {
+    $script = '
+        <!-- The template to display files available for upload -->
+        <script id="template-upload" type="text/x-tmpl">
+        {% for (var i=0, file; file=o.files[i]; i++) { %}
+            <tr class="template-upload fade">
+    ';
+if($processFiles){
+    $script .= ' <td>
+                 </td>';
+ }
+    $script .= '<td class="hidden-small">
+                    <span class="preview"></span>
+                </td>
+                <td>
+                    <p class="name">{%=file.name%}</p>
+                    <strong class="error text-danger"></strong>
+                </td>
+                <td class="hidden-small">
+                    <p class="size">Procesando...</p>
+                    <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
+                </td>
+     ';           
+ if ($admin) {
+                
+
+     $script .= ' <td>
+                        {% if (!i && !o.options.autoUpload) { %}
+                            <button class="btn btn-primary start" disabled>
+                                <i class="glyphicon glyphicon-upload"></i>
+                                <span>Comenzar</span>
+                            </button>
+                        {% } %}
+                        {% if (!i) { %}
+                            <button class="btn btn-warning cancel">
+                                <i class="glyphicon glyphicon-ban-circle"></i>
+                                <span>Cancelar</span>
+                            </button>
+                        {% } %}
+                    </td> ';
+ }
+     $script .= '                    
+            </tr>
+        {% } %}
+      </script> ' ;
+
     return $script;
 }
 
-function getDownloadJSTemplate_JC() {
-    $script = <<<DOWNLOADJSTEMPLATE
+
+function getDownloadJSTemplate_JC($admin = true, $processFiles = true) {
+    $script = '
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
    {% for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr data-id="{%=file.id%}" class="template-download fade"> 
-        <td style='background: rgba(0,0,0,0.02); vertical-align: middle; text-align: center;'>
+    <tr data-id="{%=file.id%}" class="template-download fade">
+    ';
+if($processFiles){
+    $script .= '
+        <td style="background: rgba(0,0,0,0.02); vertical-align: middle; text-align: center;">
             {% if (!file.processed) { %}
-                 <input type="radio" name='chk_procesar'>
+                 <input type="radio" name="chk_procesar">
             {% } %}
-        </td> 
-        <td class='visible-md visible-lg'>
+        </td>';
+ }
+    $script .= '
+
+        <td class="hidden-small">
             <span class="preview">
                 {% if (file.thumbnailUrl) { %}
                     <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
@@ -182,9 +245,10 @@ function getDownloadJSTemplate_JC() {
             </span>
         </td>
         <td>
+
             <p class="name">
                 {% if (file.url) { %}
-                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
+                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?"data-gallery":""%}>{%=file.name%}</a>
                 {% } else { %}
                     <span>{%=file.name%}</span>
                 {% } %}
@@ -193,27 +257,47 @@ function getDownloadJSTemplate_JC() {
                 <div><span class="label label-danger">Error</span> {%=file.error%}</div>
             {% } %}
         </td>
-        <td class='visible-md visible-lg'>
+        <td class="hidden-small">
             <span class="size">{%=o.formatFileSize(file.size)%}</span>
         </td>
-        <td>
-            {% if (file.deleteUrl) { %}
-                <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}&action=load_ajax_function"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
-                    <i class="glyphicon glyphicon-trash"></i>
-                    <span>Eliminar</span>
-                </button>
-                <input type="checkbox" name="delete" value="1" class="toggle">
-            {% } else { %}
-                <button class="btn btn-warning cancel">
-                    <i class="glyphicon glyphicon-ban-circle"></i>
-                    <span>Cancelar</span>
-                </button>
-            {% } %}
-        </td>
-    </tr>
-{% } %} 
-</script>
-DOWNLOADJSTEMPLATE;
+       ';
+if($admin) {
+$script .= ' <td>
+
+              {% if (file.deleteUrl) { %}
+                    <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}&action=load_ajax_function"{% if (file.deleteWithCredentials) { %} data-xhr-fields="{"withCredentials":true}"{% } %}>
+                        <i class="glyphicon glyphicon-trash"></i>
+                        <span>Eliminar</span>
+                    </button>
+                    <input type="checkbox" name="delete" value="1" class="toggle">
+                {% } else { %}
+                    <button class="btn btn-warning cancel">
+                        <i class="glyphicon glyphicon-ban-circle"></i>
+                        <span>Cancelar</span>
+                    </button>
+                {% } %}
+
+        </td> ';
+}
+$script .=  '   </tr>
+{% } %}
+
+</script>';
     return $script;
 }
 
+
+
+function getLoadingStateView() {
+    $script = <<<LoadingStateContainer
+<!-- The template to display files available for download -->
+<script id="template-loading" type="text/x-tmpl">
+    <div class="loadingStateContainer">
+            <div class="loaderContainer">
+                 Procesandoooooo
+            </div>
+    </div>
+</script>
+LoadingStateContainer;
+    return $script;
+}

@@ -145,10 +145,10 @@ li.list p.pad_top_20px {
     display: flex;
     justify-content: center;
 }
-.flex-container .right-panel-container input {
+.right-panel-container input {
     max-height: 30px;
 }
-.flex-container .right-valign{
+.flex-container.right-valign{
     justify-content: flex-end;
 }
 
@@ -181,7 +181,47 @@ li.list p.pad_top_20px {
 .start, .cancel, .delete{
     margin-bottom: 3px !important;
 }
-
+.loadingStateContainer {
+    position: fixed;
+    background: rgba(255,255,255,0.5);
+    width: 100%;
+    height: 100%;
+    min-width: 100vh;
+    min-height: 100vh;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    display: none;
+    transition: all 0.5s ease-in;
+}
+.loadingStateContainer.show {
+    display:  block;
+}
+.loadingStateContainer .loaderContainer{
+    font-size: 24px;
+    top: 50%;
+    position: relative;
+    text-align: center;
+}
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+.spin {
+    transition: all 0.5s ease-in;
+    animation-name: spin;
+    animation-duration: 4000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
 @media screen and (max-width: 400px) {
     .buttons-container{
         width: 100%;
@@ -201,7 +241,9 @@ li.list p.pad_top_20px {
         max-width: 100%;
         min-width: 100%;
     }
-       
+    .hidden-small{
+        display: none;
+    }
 }
 @media (max-width: 767px){
     .files .name {

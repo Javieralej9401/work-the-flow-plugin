@@ -1,5 +1,5 @@
 function wtf_file_upload_init($) {
-    
+    console.log(WtfFuAjaxVars);
     
     if ($("#fileupload").length === 0) {
         return; // nothing to do.
@@ -39,6 +39,7 @@ function wtf_file_upload_init($) {
     }).always(function () {
         $(this).removeClass('fileupload-processing');
     }).done(function (result) {
+
         $(this).fileupload('option', 'done')
             .call(this, $.Event('done'), {result: result});
     });    

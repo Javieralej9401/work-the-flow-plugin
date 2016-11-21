@@ -11,7 +11,8 @@ var JC_AudioSettings = (function($){
        uploadFilesBar: '.jc_FileUploadForm .fileupload-buttonbar',
        audioTableRow: '.files .template-download',
        processAudioSettingsBtn : '.btn_process_audio',
-       audioSettingsViewContainer: '.audioOptionViewContainer'
+       audioSettingsViewContainer: '.audioOptionViewContainer',
+       loadingStateView:  '.loadingStateContainer'
     }
 
     var getSelectedAudiosData = function(){
@@ -76,12 +77,12 @@ var JC_AudioSettings = (function($){
                     } 
             },
             beforeSend: function(){
-
-                $(viewNames.processAudioSettingsBtn).find('.texto').html('Procesando...');
+                $(viewNames.loadingStateView).addClass("show");
             }
         })
         .done(function(result) {
-            $(viewNames.processAudioSettingsBtn).find('.texto').html('Procesar');
+  
+            $(viewNames.loadingStateView).removeClass("show");
             var audioNames = result.audioData.map(function(index, elem) {
                 return index['file_name'];
             }).join();
@@ -94,10 +95,10 @@ var JC_AudioSettings = (function($){
             if(result.debug){
                 showMessage({title: 'Audios procesados', msg: result.executedCommands.join('\n\n') })
             }
-           
+            
         })
         .fail(function() {
-            $(viewNames.processAudioSettingsBtn).find('.texto').html('Procesar');
+            $(viewNames.loadingStateView).removeClass("show");
             //showMessage({title: 'Operación sin éxito', msg: 'No fue posible procesar el audio seleccionado. Por favor, intentalo nuevamente.'})
         })
         

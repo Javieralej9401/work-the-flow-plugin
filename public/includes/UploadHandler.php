@@ -156,6 +156,7 @@ class UploadHandler
         if ($options) {
             $this->options = $options + $this->options;
         }
+
         //error_log("in the uploadhandler constructor options =" . print_r($this->options, true));
         
         if ($error_messages) {
@@ -1272,6 +1273,7 @@ class UploadHandler
     }
 
     public function get($print_response = true) {
+      
 
         if ($print_response && isset($_GET['download'])) {
             return $this->download();
@@ -1284,6 +1286,19 @@ class UploadHandler
             $sqlFilter= ' AND file_name = "'. addslashes($file_name) .'"';
         }
 
+        $audioFilterOptions = array('processed' => 1, 'no-processed' => 0);
+        $audioFilterKey =  array_key_exists ('audioFilter', $this->options) ? 
+                                $this->options['audioFilter'] 
+                            : '';
+
+        $processedAudioFilter = $audioFilterOptions[$audioFilterKey];
+        // flag para identificar si hay algun filtro sobre los archivos,
+        $filterFilesData = !is_null($processedAudioFilter);
+
+        $sqlFilter .=  $filterFilesData  ? 
+                        " AND processed = " . $processedAudioFilter 
+                        : "";
+        
         // Json de los archivos del usuario
         $userFilesData = !$file_name ?  $this->get_file_objects() 
                          : [$this->get_file_object($file_name)];
@@ -1298,6 +1313,7 @@ class UploadHandler
                                         . ' ' . $sqlFilter);
 
         
+
         // Se le asigna el id de los archivos.
         foreach ($userFilesData as $key => $data) {
             $processed = false;
@@ -1318,26 +1334,38 @@ class UploadHandler
                 }
             }
 
-            // Si no encontro un match en la BD, se inserta y se obtiene el ID correspondiente
-            if($foundId === -1){
+            // Si archivos no estan filtrados, es porque no existen
+            if(!$filterFilesData){
+                // Si no encontro un match en la BD, se inserta y se obtiene el ID 
+                // correspondiente
+                if($foundId === -1){
 
-                $wpdb->insert( 
-                         $tableName, 
-                         array(
-                            'user_id' => $currentUser->ID,
-                            'file_name' => $data->name,
-                            'file_path' => $data->url
-                         )
-                );
+                    $wpdb->insert( 
+                             $tableName, 
+                             array(
+                                'user_id' => $currentUser->ID,
+                                'file_name' => $data->name,
+                                'file_path' => $data->url
+                             )
+                    );
 
-                $foundId = $wpdb->insert_id;
+                    $foundId = $wpdb->insert_id;
+                }
+
             }
-
+         
             $userFilesData[$key]->id = $foundId;
             $userFilesData[$key]->processed = (int) $processed;
-          
 
         }
+        
+
+        $userFilesData = array_values(array_filter($userFilesData, function($obj){
+            return $obj->id !== -1;
+        }));
+
+
+      // var_dump($userFilesData);
 
         if ($file_name) {
             $response = array(

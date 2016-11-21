@@ -56,8 +56,9 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       $html = get_file_upload_form_JC($action_href, $form_vars)
       . getGalleryWidgetTemplate()
       . getUploadJSTemplate_JC()
-      . getDownloadJSTemplate_JC();
-
+      . getDownloadJSTemplate_JC()
+      . getLoadingStateView();
+     
       return ($html);
     }
 
@@ -82,14 +83,21 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     public function getFrequencyIntervals($baseRightEar,$baseLeftEar){
         $leftEarStep = $rightEarStep = 500; // constante para ambos oidos.
 
+        $rightBottom = $baseRightEar-$rightEarStep;
+        $rightTop = $baseRightEar+$rightEarStep;
+
+        $leftBottom = $baseLeftEar-$leftEarStep;
+        $leftTop = $baseLeftEar+$leftEarStep;
+
+      
         return array(
           'rightEarInterval' => array(
-                                  'bottom' => $baseRightEar-$rightEarStep, //Baja
-                                  'top' => $baseRightEar+$rightEarStep //Alta
+                                  'bottom' => $rightBottom, //Baja
+                                  'top' => $rightTop //Alta
                                   ),
           'leftEarInterval' => array(
-                                  'bottom' => $baseLeftEar-$leftEarStep, // Baja
-                                  'top' => $baseLeftEar+$leftEarStep //Alta
+                                  'bottom' => $leftBottom, // Baja
+                                  'top' => $leftTop //Alta
                                   )
           );
       }
@@ -97,13 +105,17 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     /*
     * Función que genera un nombre de archivo manteniendo la extension.
     */
-    public function generateFileName($file_name = '', $newNamePrefix = '', $newNameSufix = ''){
+    public function generateFileName($file_name = '', $newNamePrefix = '', $newNameSufix = '', $ext = null){
+
 
       // Nombre del archivo sin extension
       $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $file_name);
 
-      //Nuevo nombre temporal
-      $newName = str_replace($withoutExt, $newNamePrefix.$withoutExt.$newNameSufix , $file_name);
+   
+         //Nuevo nombre temporal
+      $newName = !$ext ? str_replace($withoutExt, $newNamePrefix.$withoutExt.$newNameSufix , $file_name)
+                  :  $newNamePrefix.$withoutExt.$newNameSufix.$ext;     
+     
 
       return $newName;
     }
@@ -191,7 +203,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                                    WHERE user_id = ". $currentUser->ID 
                                    . " AND file_name = '". $fileName. "' )");
       
-        if($queryRs == 0 && file_exists(self::getUploadPath(true) . '/' . $fileName ) ){
+        if($queryRs == 0 && file_exists( self::getUploadPath(true) . "/" . $fileName) ){
 
             $wpdb->insert( 
                $tableName, 
@@ -207,7 +219,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
 
     }
 
-    /*
+ /*
     * Función que se ejecuta para procesar los audios selecionados
     */
     public static function processAudioHandler() {
@@ -243,9 +255,9 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
         */
         $earFrequencyIntervals = self::getFrequencyIntervals($rightEarSettingValue, $leftEarSettingValue);
         // Ruta de la carpeta temporal dentro de la carpeta del usuario. (/ruta/de/la/carpeta/tmp)
-        $ruta_carpeta_temp = self::getTempAudioPath();
+        $ruta_carpeta_temp = self::getTempAudioPath(true);
         // Ruta de la carpeta de los audios del usuario.
-        $carpeta_audios_usuario = self::getUploadPath();
+        $carpeta_audios_usuario = self::getUploadPath(true);
 
         //Nombre del audio final  ejemplo: Miaudio.mp3 (Izq: 250, Der: 550) ---> 250-550Miaudio.mp3
         $NOMBRE_AUDIO_FINAL = self::generateFileName(
@@ -258,7 +270,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
 
         // Si ya existe ese archivo se borra, para evitar duplicados
         // (Caso en que se procese dos veces un audio con los mismos parametros de entrada)
-        if(file_exists(self::getUploadPath(true) . '/' . $NOMBRE_AUDIO_FINAL )){
+        if(file_exists($RUTA_AUDIO_FINAL)){
             unlink(self::getUploadPath(true) . '/' . $NOMBRE_AUDIO_FINAL );
 
         }
@@ -281,9 +293,10 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                                                               'L_');
         $out2 = $ruta_carpeta_temp.'/'. self::generateFileName($preProcessingData['audioFileData']->file_name,
                                                                'R_');
+
         $myCommandBatch = array(
               array(
-                'commandTemplate' => 'sox [RUTA_AUDIO] -C 320 -c 1 [RUTA_TMP_AUDIO]  sinc [PARAM] mixer -l', // Plantilla del comando
+                'commandTemplate' => 'sox [RUTA_AUDIO] -C 320 -c 1 [RUTA_TMP_AUDIO]  sinc [PARAM] -l', // Plantilla del comando
                 'commandTemplateVariables' => array(
                   '[RUTA_AUDIO]',
                   '[RUTA_TMP_AUDIO]',
@@ -292,11 +305,11 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 'commandTemplateArguments' => array( // En el mismo orden anterior
                     $audioFileData->file_path, //RUTA_AUDIO
                     $out1, //RUTA_TMP_AUDIO
-                    escapeshellarg($earFrequencyIntervals['leftEarInterval']['top']."-".$earFrequencyIntervals['leftEarInterval']['bottom'] ) //PARAM
+                    escapeshellarg($earFrequencyIntervals['leftEarInterval']['top']."-".$earFrequencyIntervals['leftEarInterval']['bottom']) //PARAM
                  ) // Los argumentos que se sustituye
               ),
               array(
-                'commandTemplate' => 'sox [RUTA_AUDIO] -C 320 -c 1 [RUTA_TMP_AUDIO]  sinc [PARAM] mixer -r', 
+                'commandTemplate' => 'sox [RUTA_AUDIO] -C 320 -c 1 [RUTA_TMP_AUDIO]  sinc [PARAM] -r',   
                 'commandTemplateVariables' => array(
                   '[RUTA_AUDIO]',
                   '[RUTA_TMP_AUDIO]',
@@ -322,7 +335,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 ) 
               ),
               array(
-                'commandTemplate' => 'sox [PARAM1] -c 320 [AUDIO_SALIDA]', 
+                'commandTemplate' => 'sox [PARAM1] -C 320 [AUDIO_SALIDA]', 
                 'commandTemplateVariables' => array(
                   '[PARAM1]',
                   '[AUDIO_SALIDA]',
@@ -333,7 +346,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 ) 
               ),
               array(
-                'commandTemplate' => 'sox [AUDIO_SALIDA] -n spectogram -c [PARAM1]  -o [PARAM2]', 
+                'commandTemplate' => 'sox [AUDIO_SALIDA] -n spectrogram -c [PARAM1]  -o [PARAM2]', 
                 'commandTemplateVariables' => array(
                   '[AUDIO_SALIDA]',
                   '[PARAM1]',
@@ -341,27 +354,32 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 ), 
                 'commandTemplateArguments' => array(
                   $RUTA_AUDIO_FINAL, 
-                  escapeshellarg('By SoBi Labs'), 
-                  $ruta_carpeta_temp.'/'.'chakras.png'
+                  escapeshellarg("By SoBi Labs"), 
+                  self::getUploadPath(true).'/'.self::generateFileName(
+                            $preProcessingData['audioFileData']->file_name, //Nombre base
+                            $preProcessingData['leftEarSettingValue'].'-'.$preProcessingData['rightEarSettingValue'], // prefijo
+                             null,
+                             '.png'
+                      )
                 ) 
               ),
         );
 
 
         //Simulando la ejecucion del comando final (crea un archivo .mp3 vacio)
-        // file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
+         file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
 
         // Se ejecuta la cola de comandos
         $executedCommands = self::executeCommandBatch($myCommandBatch);
 
         // Vaciando la carpeta temporal
-        self::emptyTmpFolder();
+     //   self::emptyTmpFolder();
  
         /**
          * Se registra el audio final en la tabla, verificando de que existe el audio generado
          * por la cola de comandos.
          */
-        self::registerFinalOutput($RUTA_AUDIO_FINAL, $NOMBRE_AUDIO_FINAL);
+        self::registerFinalOutput(self::getUploadPath() . '/' . $NOMBRE_AUDIO_FINAL , $NOMBRE_AUDIO_FINAL);
 
         // var_dump($executedCommands);
         /* 

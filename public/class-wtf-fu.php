@@ -34,6 +34,10 @@ require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-fileupload-shor
 require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-workflow-shortcode.php' );
 require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-show-files-shortcode.php' );
 require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-fileupload_JC-shortcode.php' );
+require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-process_audio_JC-shortcode.php' );
+require_once( plugin_dir_path(__FILE__) . 'includes/class-wtf-fu-show_processed_audios_JC-shortcode.php' );
+
+
 
 
 
@@ -89,6 +93,13 @@ class Wtf_Fu {
         add_action('wp_ajax_load_ajax_function', array($this, 'wtf_fu_load_ajax_function'));
         add_action('wp_ajax_nopriv_load_ajax_function', array($this, 'wtf_fu_load_ajax_function'));
 
+        add_action('wp_ajax_audio_load_ajax_function', array($this, 'wtf_fu_audio_load_ajax_function'));
+        add_action('wp_ajax_nopriv_audio_load_ajax_function', array($this, 'wtf_fu_audio_load_ajax_function'));
+
+        add_action('wp_ajax_processed_audio_load_ajax_function', array($this, 'wtf_fu_processed_audio_load_ajax_function'));
+        add_action('wp_ajax_nopriv_processed_audio_load_ajax_function', array($this, 'wtf_fu_processed_audio_load_ajax_function'));
+
+
         add_action('wp_ajax_wtf_fu_workflow', array($this, 'wtf_fu_ajax_workflow_function'));
         add_action('wp_ajax_nopriv_wtf_fu_workflow', array($this, 'wtf_fu_ajax_workflow_function'));
 
@@ -109,7 +120,10 @@ class Wtf_Fu {
         add_shortcode('wtf_fu_upload', array($this, 'file_upload_shortcode'));
         add_shortcode('wtf_fu_show_files', array($this, 'show_files_shortcode'));
         add_shortcode('wtf_fu_upload_audio', array($this, 'file_upload_JC_shortcode'));
-      
+        add_shortcode('wtf_fu_process_audio', array($this, 'process_audio_JC_shortcode'));
+        add_shortcode('wtf_fu_show_processed_audios', array($this, 'show_processed_audio_JC_shortcode'));
+    
+ 
        
 
     }
@@ -426,7 +440,7 @@ class Wtf_Fu {
     public function enqueue_scripts() {
 
         if (self::wtf_fu_has_shortcode('wtf_fu')) {
-            
+
             // use WP supplied JQuery libs where possible.
             $jsarr = array('jquery', 'jquery-ui-core', 'jquery-ui-widget', 'jquery-ui-accordion', 'jquery-ui-sortable');           
             foreach ( $jsarr as $js ) {
@@ -475,6 +489,24 @@ class Wtf_Fu {
            
             $fileupload_handle = $this->plugin_slug . '-file-upload';
 
+            $audioShortCodesFilter =   array("wtf_fu_upload_audio" => "", 
+                                            "wtf_fu_process_audio" => "no-processed",  
+                                            "wtf_fu_show_processed_audios" => "processed"
+                                            );
+            
+            $audioFilter =  "";
+            foreach ($audioShortCodesFilter as $key => $value) {
+                 if(self::wtf_fu_has_shortcode($key) && $value === ""){
+                        return;
+                 }
+                
+                 $audioFilter = ($value === "processed" && $audioFilter === "no-processed" )
+                                 ||   ($value === "no-processed" && $audioFilter === "processed" )        
+                                 ? "" :  $value;
+
+            }
+           
+
             if (!wp_script_is($fileupload_handle, 'enqueued')) {
                 //log_me('class-wtf-fu registering and enqueuing ' . $fileupload_handle);
                 wp_register_script($fileupload_handle, plugin_dir_url(__FILE__) . 'assets/js/wtf-fu-file-upload.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
@@ -482,6 +514,7 @@ class Wtf_Fu {
 
                 $ret = wp_localize_script($fileupload_handle, 'WtfFuAjaxVars', 
                         array(
+                            'audioFilter' =>  $audioFilter,
                             'url' => admin_url('admin-ajax.php'), 
                             'absoluteurl' => wtf_fu_JQUERY_FILE_UPLOAD_URL . 'cors/result.html?%s'// , 'security' => wp_create_nonce('wtf_fu_upload_nonce')                            
                 ));
@@ -539,7 +572,18 @@ class Wtf_Fu {
         $content = $shortcode_instance->generate_content();
         return $content;
     }
-
+    function process_audio_JC_shortcode($attr){
+        $shortcode_instance = new Wtf_Fu_ProcessAudio_JC_Shortcode($attr);
+        $content = $shortcode_instance->generate_content();
+    
+        return $content;
+    }
+    function show_processed_audio_JC_shortcode($attr){
+        $shortcode_instance = new Wtf_Fu_ShowProcessedAudios_JC_Shortcode($attr);
+        $content = $shortcode_instance->generate_content();
+      
+        return $content;
+    }
 
     /**
      * Wrapper that delegates the file upload ajax action hook to static method
@@ -550,6 +594,14 @@ class Wtf_Fu {
      */
     function wtf_fu_load_ajax_function() {
         Wtf_Fu_Fileupload_Shortcode::wtf_fu_load_ajax_function();
+    }
+    
+    function wtf_fu_audio_load_ajax_function() {
+        Wtf_Fu_ProcessAudio_JC_Shortcode::wtf_fu_load_ajax_function();
+    }
+
+    function wtf_fu_processed_audio_load_ajax_function() {
+        Wtf_Fu_ShowProcessedAudios_JC_Shortcode::wtf_fu_load_ajax_function();
     }
 
     function wtf_fu_ajax_workflow_function() {

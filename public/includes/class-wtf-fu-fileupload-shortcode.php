@@ -33,7 +33,6 @@ class Wtf_Fu_Fileupload_Shortcode {
     protected $plugin_slug = 'work-the-flow-file-upload';
     protected static $instance = null;
     protected $options;
-
     public function __construct($attr) {
         $this->options = $attr;
         // log_me(array('Wtf_Fu_Fileupload_Shortcode constructor()' => $attr));
@@ -44,9 +43,8 @@ class Wtf_Fu_Fileupload_Shortcode {
         
 //        log_me(array("ajax handler REQUEST:" => $_REQUEST));        
 //        check_ajax_referer( 'wtf_fu_upload_nonce', 'security' );
-        
         ob_start();
-        
+      
         // Get the option defaults.
         $db_options = Wtf_Fu_Options::get_upload_options();
         if ((wtf_fu_get_value($db_options, 'deny_public_uploads') == true) && !is_user_logged_in()) {
@@ -75,11 +73,11 @@ class Wtf_Fu_Fileupload_Shortcode {
         error_reporting(E_ALL | E_STRICT);
         
         ob_end_clean(); // Discard any warnings output.
-                  
         $upload_handler = new UploadHandler($options);
 
         die(); // always exit after an ajax call.
     }
+   
 
     /**
      * Massage captured options into a format consistent with the JQuery 
