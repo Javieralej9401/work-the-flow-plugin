@@ -261,333 +261,44 @@ li.list p.pad_top_20px {
 .jc_FileUploadForm h2.audioTitle{
     text-align: center;
 }
-
+.preview audio {
+    width:  100% !important;
+}
 /**
  *
  * Estilos del Generador de Frecuencia
  *
  */
-@charset "UTF-8";
-.freqGenContainer kbd {
-  padding: 0px 4px;
-  background-color: rgba(255, 210, 176, 0.5);
-  background-color: rgba(228, 186, 155, 0.5);
-  background-color: rgba(255, 255, 255, 0.11);
-  color: #8E3B00;
-  /*#FFD2B0*/
-  /*#E4BA9B */
-  white-space: nowrap;
-  font-family: inherit;
-  font-weight: normal;
-  font-style: normal;
-  font-size: 85%;
-  border: 1px solid #9B5622;
-  border-bottom-width: 2px;
-  border-radius: 3px;
+
+.freqGenContainer {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 10px;
 }
-.freqGenContainer span.button-name {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background-color: #BB6E34;
-  color: #F5DBC6;
-  padding: 1px 4px;
-  border-radius: 3px;
-}
-.freqGenContainer button, .freqGenContainer span.button {
-  display: inline-block;
-  background-color: #BB6E34;
-  color: white;
-  border: none;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-family: inherit;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-appearance: none;
-  border-radius: 2px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: -1px 2px 1px 1px rgba(0, 0, 0, 0.4);
-}
-.freqGenContainer button:focus {
-  outline: dotted 1px rgba(255, 255, 255, 0.8);
-}
-.freqGenContainer button::-moz-focus-inner {
-  padding: 0;
-  border: 0;
-}
-.freqGenContainer button:hover {
-  background-color: #C97438;
-}
-.freqGenContainer span.button:hover {
-  background-color: #C97438;
-}
-.freqGenContainer button.window-shown {
-  background-color: #874e23;
-}
-.freqGenContainer button#play-button {
-  margin: 0 3px 9px 1px;
-  padding: 0.58em 1em;
-  width: 10em;
-  font-size: 14px;
-}
-.freqGenContainer .controls button, .freqGenContainer .controls span.button {
-  margin-bottom: 3px;
-  height: 20px;
-  padding: 1px 5px;
-  color: #F5DBC6;
-  text-align: left;
-  letter-spacing: 0.3px;
-  font-size: 11px;
-  line-height: 16px;
-}
-.freqGenContainer #play-indicator {
-  display: inline-block;
-  width: 24px;
-  height: 18px;
-  vertical-align: middle;
-  background-image: url("icons.png");
-  background-position: -122px -4px;
-  background-size: auto 24px;
-  transition: opacity 0.2s;
-}
-.freqGenContainer #play-indicator.playing {
-  opacity: 1;
-}
-.freqGenContainer #play-indicator.stopped {
-  opacity: 0;
-}
-.freqGenContainer #slider {
-  background: #FE9749;
-  background-image: linear-gradient(to bottom, #ffd2b0, #ffd2b0 42%, #e4ba9b 82%, #e4ba9b);
-  background-image: -webkit-linear-gradient(top, #ffd2b0, #ffd2b0 42%, #e4ba9b 82%, #e4ba9b);
-  border: solid 1px #EFD7C5;
-  height: 22px;
-  box-shadow: -1px 1px 2px #815c41;
-}
-.freqGenContainer #slider .ui-slider-range {
-  background: #FE9749;
-  background-image: linear-gradient(to bottom, #ffd2b0, #ffd2b0 42%, #e4ba9b 82%, #e4ba9b);
-  background-image: -webkit-linear-gradient(top, #ffd2b0, #ffd2b0 42%, #e4ba9b 82%, #e4ba9b);
-}
-.freqGenContainer #slider .ui-slider-handle {
-  top: -5px;
-  width: 22px;
-  height: 32px;
-  margin-left: -12px;
-  border-radius: 4px;
-  background-image: linear-gradient(to bottom, #fbfaf9, #fbfaf9 42%, #eee9e6 62%, #d5cdc6);
-  background-image: -webkit-linear-gradient(top, #fbfaf9, #fbfaf9 42%, #eee9e6 62%, #d5cdc6);
-  box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.3);
-  outline: none;
-  /* disable Chrome default outline on focused elements */
-}
-.freqGenContainer #slider .ui-slider-handle.ui-state-default {
-  border: solid 1px #7c593f;
-}
-.freqGenContainer #slider .ui-slider-handle.ui-state-focus {
-  background: #fff;
-  border: solid 1px #9b704f;
-  box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.3), inset 0px 0px 2px 3px #fff;
+.freqGenContainer .ui-widget-header{
+    color: #ffffff !important;
+    background: #999999 !important;
+    border-color: inherit !important;
 }
 .freqGenContainer #volume-slider {
   display: inline-block;
-  border: solid 1px #EFD7C5;
+  border: solid 1px inherit;
   border-style: none none solid none;
   border-width: 1px;
-  border-color: #db884a;
-  border-color: #F6B584;
   border-style: none;
   border-style: solid;
-  border-color: #db884a;
-  border-color: #a55f2b;
   width: 60px;
   height: 8px;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7) inset, 0px 1px 0px rgba(255, 255, 255, 0.3);
-  background: #ce8856;
-}
-.freqGenContainer #volume-slider .ui-slider-range {
-  background-image: -webkit-linear-gradient(top, #D5884D 0%, #D7894C 42%, #C9793F 82%, #BD7440 100%);
-  background-image: linear-gradient(to bottom, #D5884D 0%, #D7894C 42%, #C9793F 82%, #BD7440 100%);
+ 
 }
 .freqGenContainer #volume-slider .ui-slider-handle {
   width: 10px;
   height: 12px;
   top: -3px;
-  border: solid 1px #965C33;
-  background-image: -webkit-linear-gradient(top, #febe8f 0%, #e7a26e 42%, #E09259 82%, #E19965 100%);
-  background-image: linear-gradient(to bottom, #febe8f 0%, #e7a26e 42%, #E09259 82%, #E19965 100%);
-  box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.1);
-}
-.freqGenContainer #volume-slider .ui-slider-handle.ui-state-focus {
-  box-shadow: -1px 1px 2px rgba(255, 255, 255, 0.1), inset -2px -2px 8px rgba(255, 255, 255, 0.6), inset 2px 2px 8px rgba(255, 255, 255, 0.6);
-  outline: none;
-}
-.freqGenContainer label#volume-slider-label {
-  display: inline-block;
-  width: 23px;
-  height: 9px;
-  background-image: url("icons.png");
-  background-size: auto 18px;
-  background-position: -57px bottom;
-}
-.freqGenContainer #volume-readout {
-  display: inline-block;
-  width: 2.5em;
-  margin-left: 3px;
-  font-weight: 400;
-  font-size: 12px;
-}
-.freqGenContainer label#volume-slider-label {
-  margin-right: 3px;
-}
-.freqGenContainer .controls {
-  position: relative;
-  margin: 0 auto;
-  padding: 8px 0px;
-  width: 100%;
-  max-width: 720px;
-  font-size: 14px;
-  font-weight: 600;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.freqGenContainer .controls .control-group {
-  display: inline-block;
-  vertical-align: bottom;
-  white-space: nowrap;
-  line-height: 51px;
-}
-.freqGenContainer .controls .control-group > * {
-  vertical-align: middle;
-}
-.freqGenContainer .controls span.separator {
-  display: inline-block;
-  margin-right: 48px;
-}
-.freqGenContainer #freq-readout {
-  display: inline-block;
-  text-align: center;
-  width: 130px;
-  font-size: 23px;
-  -moz-user-select: -moz-all;
-  -webkit-user-select: auto;
-  user-select: all;
-}
-.freqGenContainer #freq-readout small {
-  font-size: 75%;
-  font-weight: normal;
-}
-.freqGenContainer .controls .freq-button {
-  display: inline-block;
-  width: 24px;
-  height: 32px;
-  background-image: url("icons.png");
-  background-size: auto 32px;
-  cursor: pointer;
-  background-color: inherit;
-  border: none;
-  box-shadow: none;
-}
-.freqGenContainer #freq-down-button {
-  background-position: 0px 0px;
-}
-.freqGenContainer #freq-up-button {
-  background-position: -26px 0px;
-}
-.freqGenContainer #freq-down-button:hover {
-  background-position: -48px 0px;
-}
-.freqGenContainer #freq-up-button:hover {
-  background-position: -74px 0px;
-}
-.freqGenContainer .controls .octave-button {
-  display: inline-block;
-  font-size: 12px;
-  color: #F3D6BF;
-  cursor: pointer;
-  background: #b4672d;
-  height: 17px;
-  line-height: 17px;
-  width: 20px;
-  text-align: center;
-  border-radius: 3px;
-  box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-  margin-top: 3px;
-  margin-bottom: 0px;
-  letter-spacing: normal;
-  padding: 0;
-}
-.freqGenContainer .controls .octave-button:hover {
-  background: #C97438;
-}
-.freqGenContainer label#note-selector-label {
-  display: inline-block;
-  margin-right: 4px;
-  width: 9px;
-  height: 18px;
-  background-image: url("icons.png");
-  background-size: auto 20px;
-  background-position: -91px -1px;
-}
-.freqGenContainer button#note-selector {
-  position: relative;
-}
-.freqGenContainer button#note-selector:after {
-  content: '▼';
-  color: #F5DBC6;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: 1em;
-  background: inherit;
-  padding: 1px 3px 1px 5px;
-}
-.freqGenContainer #author {
-  margin: 60px 0px 30px 0px;
-  font-size: 13px;
-  color: #f4f2f2;
-  text-shadow: -1px 1px 3px #654;
-}
-.freqGenContainer div#browser-warning {
-  position: fixed;
-  box-sizing: border-box;
-  border-radius: 5px;
-  top: 30%;
-  left: 20%;
-  width: 60%;
-  padding: 2em;
-  background-color: #999;
-  opacity: 0.9;
-  z-index: 1000;
-  font-size: 18px;
-  color: white;
-}
-.freqGenContainer #get-link-window {
-  z-index: 100;
-  background-color: #FBC49D;
-  padding: 25px 25px;
-  border-radius: 3px;
-  opacity: 0.97;
-  box-shadow: 0px 0px 120px 40px rgba(0, 0, 0, 0.25);
-}
-.freqGenContainer #get-link-window .desc {
-  margin-bottom: 0.25em;
-}
-.freqGenContainer #get-link-window .message {
-  font-size: 13px;
-  font-style: italic;
-  text-align: center;
-  margin: 1em 0 -1em 0;
-}
-.freqGenContainer #get-link-window .box {
-  background-color: white;
-  border: solid 1px #aaa;
-  padding: 4px 7px;
+  border: solid 1px inherit;
+ 
 }
 .freqGenContainer #note-selector-panel {
   z-index: 90;
@@ -600,10 +311,9 @@ li.list p.pad_top_20px {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px 22px;
-  background-color: #FBC49D;
-  background-color: #F09F66;
   border-radius: 3px;
-  box-shadow: 0px 0px 120px 40px rgba(0, 0, 0, 0.25);
+  background:  rgba(0, 0, 0, 0.03);
+
 }
 .freqGenContainer #note-selector-panel .close-button {
   position: absolute;
@@ -618,8 +328,8 @@ li.list p.pad_top_20px {
   text-align: center;
   box-shadow: none;
   background: none;
-  border: solid 2px #874e23;
-  color: #874e23;
+  border: solid 2px inherit;
+
 }
 .freqGenContainer #note-selector-panel .close-button:hover {
   background-color: rgba(255, 255, 255, 0.15);
@@ -645,11 +355,9 @@ li.list p.pad_top_20px {
   font-size: 14px;
   overflow: hidden;
   padding: 0 2px;
-  background-color: #9C5C2C;
+
 }
-.freqGenContainer #note-selector-panel > table button:hover {
-  background-color: #A86234;
-}
+
 .freqGenContainer #note-selector-panel button > small {
   display: block;
   font-size: 11px;
@@ -660,38 +368,6 @@ li.list p.pad_top_20px {
   .freqGenContainer #note-selector-panel button > small {
     display: none;
   }
-}
-.freqGenContainer .support {
-  margin: 2em 0 10em 0;
-}
-.freqGenContainer button.donate {
-  padding: 0.6em 0.7em;
-  font-size: 13px;
-}
-.freqGenContainer .donate-tip {
-  font-size: 13px;
-  font-style: italic;
-  text-align: center;
-  margin-top: 0.3em;
-}
-.freqGenContainer .support-link {
-  display: inline-block;
-  float: right;
-  font-size: 11px;
-  color: #F5DBC6;
-  line-height: 22px;
-  padding: 0 0.8em;
-  border: solid 1px #ae6229;
-  color: #7a3400;
-  background-color: transparent;
-  box-shadow: none;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-decoration: none;
-  border-radius: 2px;
-}
-.freqGenContainer .support-link:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 .freqGenContainer #note-selector-panel table {
   border: 0;
@@ -708,10 +384,32 @@ li.list p.pad_top_20px {
 .freqGenContainer #note-selector-panel td {
   padding: 2px;
 }
+.freqGenContainer .controls button{
+    font-size: 12px;
+}
+
+.freqGenContainer .control-group {
+    display: inline-block;
+}
+
+
 @media only screen and (max-height: 600px) {
   .freqGenContainer #note-selector-panel {
     top: 2%;
     height: calc(100% - 20px);
     overflow-y: auto;
   }
+
 }
+@media  (max-width: 500px) {
+     .freqGenContainer .control-group{
+            width:  100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+      }
+      .freqGenContainer .control-group button{
+            margin: 5px;
+      }
+}
+

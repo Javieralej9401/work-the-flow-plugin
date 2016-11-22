@@ -123,7 +123,7 @@ class Wtf_Fu {
         add_shortcode('wtf_fu_upload_audio', array($this, 'file_upload_JC_shortcode'));
         add_shortcode('wtf_fu_process_audio', array($this, 'process_audio_JC_shortcode'));
         add_shortcode('wtf_fu_show_processed_audios', array($this, 'show_processed_audio_JC_shortcode'));
-        add_shortcode('wtf_fu_frequency_generator', array($this, 'show_frequency_generator_JC_shortcode'));
+        add_shortcode('wtf_fu_show_frequency_generator', array($this, 'show_frequency_generator_JC_shortcode'));
     
     }
 
@@ -424,7 +424,9 @@ class Wtf_Fu {
             wp_enqueue_style($this->plugin_slug . '-bluimp-gallery-style', wtf_fu_JQUERY_FILE_UPLOAD_DEPENDS_URL . 'css/blueimp-gallery.min.css', array(), self::VERSION);
             wp_enqueue_style($this->plugin_slug . '-jquery-fileupload-style', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'css/jquery.fileupload.css', array(), self::VERSION);
             wp_enqueue_style($this->plugin_slug . '-jquery-fileupload-ui-style', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'css/jquery.fileupload-ui.css', array(), self::VERSION);
-            wp_enqueue_style("jquery-ui-css", plugin_dir_url(__FILE__) . 'assets/js/jquery-ui.min.css', array(), Wtf_Fu::VERSION);
+            if(self::wtf_fu_has_shortcode('wtf_fu_show_frequency_generator')){
+                wp_enqueue_style("jquery-ui-css", plugin_dir_url(__FILE__) . 'assets/js/jquery-ui.min.css', array(), Wtf_Fu::VERSION);
+            }
           
             $plugin_options = Wtf_Fu_Options::get_plugin_options();
             if (wtf_fu_get_value($plugin_options, 'include_plugin_style') == true) {
@@ -490,10 +492,10 @@ class Wtf_Fu {
 
             wp_enqueue_script($this->plugin_slug . '-jquery-fileupload-validate-js', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'js/jquery.fileupload-validate.js', array('jquery'), self::VERSION, true);
             wp_enqueue_script($this->plugin_slug . '-jquery-fileupload-ui-js', wtf_fu_JQUERY_FILE_UPLOAD_URL . 'js/jquery.fileupload-ui.js', array('jquery'), self::VERSION, true);
-            wp_enqueue_script("jquery-ui", plugin_dir_url(__FILE__) . 'assets/js/jquery-ui.min.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
-          
-            wp_enqueue_script("frequency-generator-mini", plugin_dir_url(__FILE__) . 'assets/js/frequency-generator-mini.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
-               
+            if(self::wtf_fu_has_shortcode('wtf_fu_show_frequency_generator')){
+                wp_enqueue_script("jquery-ui", plugin_dir_url(__FILE__) . 'assets/js/jquery-ui.min.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
+                wp_enqueue_script("frequency-generator-mini", plugin_dir_url(__FILE__) . 'assets/js/frequency-generator-mini.js', array('jquery', 'wp-ajax-response'), Wtf_Fu::VERSION, true);
+            }  
 
 
             //<!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->

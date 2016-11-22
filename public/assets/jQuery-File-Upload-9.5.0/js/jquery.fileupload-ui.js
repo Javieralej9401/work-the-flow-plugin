@@ -476,10 +476,10 @@
                 formatFileSize: this._formatFileSize,
                 options: this.options
             });
+            
             if (result instanceof $) {
                 return result;
             }
-
             return $(this.options.templatesContainer).html(result).children();
         },
 

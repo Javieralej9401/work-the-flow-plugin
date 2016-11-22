@@ -53,7 +53,7 @@ class Wtf_Fu_ShowProcessedAudios_JC_Shortcode  extends Wtf_Fu_Fileupload_JC_Shor
       $html = getProcessAudioForm($action_href, $form_vars, "processed_audiosForm", "processed", true, false, "processedAudioTmp")
       . getGalleryWidgetTemplate()
      // . getUploadJSTemplate_JC(true, false)
-      . getDownloadJSTemplate_JC(true, false, "processedAudioTmp");
+      . getDownloadJSTemplate_JC(true, false, "processedAudioTmp", true);
    
        return ($html);
     }

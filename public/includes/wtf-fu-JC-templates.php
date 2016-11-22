@@ -49,7 +49,7 @@ function getMainAudioTableView($admin = true, $processFiles = true, $title=""){
     $view .= '        <th>Archivo</th>';
     $view .= '        <th class="hidden-small">Tamaño</th>';
     if($admin){
-    $view .= '        <th>Acciones</th>';
+    $view .= '        <th>Acciones </th>';
     }
     $view .= '   </thead>';
     $view .= '   <tbody class="files"></tbody>';
@@ -153,7 +153,7 @@ function getProcessAudioForm($action_href, $form_vars, $formId, $audioFilter = "
     if(!$processFiles){
         $audioOptionsView = '';
     }
-    $title = $processFiles ? "Sonidos no procesados" :  "Sonidos procesados";
+    $title = $processFiles ? "Tus sonidos" :  "Sonidos procesados";
 
     $mainTableView = getMainAudioTableView($admin, $processFiles, $title);
     $loaderContainerView =  getLoaderContainerView();
@@ -187,14 +187,14 @@ if($processFiles){
     $script .= ' <td>
                  </td>';
  }
-    $script .= '<td class="hidden-small">
+    $script .= '<td class="hidden-small" style="overflow:hidden">
                     <span class="preview"></span>
                 </td>
                 <td>
                     <p class="name">{%=file.name%}</p>
                     <strong class="error text-danger"></strong>
                 </td>
-                <td class="hidden-small">
+                <td class="hidden-small" >
                     <p class="size">Procesando...</p>
                     <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
                 </td>
@@ -226,10 +226,11 @@ if($processFiles){
 }
 
 
-function getDownloadJSTemplate_JC($admin = true, $processFiles = true, $tmpId = "template-download") {
+function getDownloadJSTemplate_JC($admin = true, $processFiles = true, $tmpId = "template-download", $noUploadAction = false) {
     $script = '
 <!-- The template to display files available for download -->
 <script id="'.$tmpId.'" type="text/x-tmpl">
+
    {% for (var i=0, file; file=o.files[i]; i++) { %}
     <tr data-id="{%=file.id%}" class="'.$tmpId.' template-download" fade">
     ';
@@ -242,8 +243,8 @@ if($processFiles){
         </td>';
  }
     $script .= '
-
-        <td class="hidden-small">
+       
+        <td class="hidden-small" style="overflow:hidden">
             <span class="preview">
                 {% if (file.thumbnailUrl) { %}
                     <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
@@ -251,10 +252,10 @@ if($processFiles){
             </span>
         </td>
         <td>
-
+          
             <p class="name">
                 {% if (file.url) { %}
-                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?"data-gallery":""%}>{%=file.name%}</a>
+                    <a  href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?"data-gallery":""%}>{%=file.name%}</a>
                 {% } else { %}
                     <span>{%=file.name%}</span>
                 {% } %}
@@ -275,7 +276,14 @@ $script .= ' <td>
                         <i class="glyphicon glyphicon-trash"></i>
                         <span>Eliminar</span>
                     </button>
-                    <input type="checkbox" name="delete" value="1" class="toggle">
+    ';
+
+if(!$noUploadAction){
+$script .= '
+                     <input type="checkbox" name="delete" value="1" class="toggle">
+';
+}
+$script .=     '
                 {% } else { %}
                     <button class="btn btn-warning cancel">
                         <i class="glyphicon glyphicon-ban-circle"></i>
@@ -308,29 +316,29 @@ LoadingStateContainer;
 
 function getFrequencyGeneratorView(){
  $script = <<<FrequencyGenerator
-    <div  class="freqGenContainer">
-            <button class="button" id="play-button" title="Play/Stop [Space]" onclick="freqGen.onPlayButtonClick()">Play</button>
+    <div  class="tbs freqGenContainer">
+            <button class="button" id="play-button" title="Reproducir/Parar [Espacio]" onclick="freqGen.onPlayButtonClick()"><i class='glyphicon glyphicon-play'> </i> Reproducir </button>
             <span id="play-indicator" class="stopped"></span>
 
-            <div id="slider" style="margin: 40px 0px 18px 0px" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 44.1155%;"></div><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" style="left: 44.1155%;"></span></div>
+            <div id="slider" style="margin: 40px 0px 18px 0px" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" ></div><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" ></span></div>
             <div class="controls">
                 <span class="control-group">
-                    <label id="volume-slider-label"></label>    
-                    <span id="volume-slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 100%;"></div><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" style="left: 100%;"></span></span>
-                    <span id="volume-readout">100%</span>
+                    <label id="volume-slider-label"><i class='glyphicon glyphicon-volume-up'></i></label>    
+                    <span id="volume-slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" ></div><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" ></span></span>
+                    <span id="volume-readout"></span>
                     <span class="separator"></span>
                 </span>
                 <span class="control-group">
-                    <button class="octave-button" id="octave-down-button" title="− 1 octave (frequency ÷ 2)" style="margin-right: 10px">×½</button>
-                    <button class="freq-button" id="freq-down-button" title="– 1 Hz [Shift+←]"></button>
-                    <span id="freq-readout"><small></small>404<small> Hz</small></span>
-                    <button class="freq-button" id="freq-up-button" title="+ 1 Hz [Shift+→]"></button>
-                    <button class="octave-button" id="octave-up-button" title="+ 1 octave (frequency × 2)" style="margin-left: 10px;">×2</button>
+                    <button class="octave-button" id="octave-down-button" title="− 1 octava (frecuencia ÷ 2)" style="margin-right: 10px">×½</button>
+                    <button class="freq-button" id="freq-down-button" title="– 1 Hz [Shift+←]"><i class='glyphicon glyphicon-step-backward'></i></button>
+                    <span id="freq-readout"></span>
+                    <button class="freq-button" id="freq-up-button" title="+ 1 Hz [Shift+→]"><i class='glyphicon glyphicon-step-forward'></i></button>
+                    <button class="octave-button" id="octave-up-button" title="+ 1 octava (frecuencia × 2)" >×2</button>
                     <span class="separator"></span>
                 </span>
                 <span class="control-group">
                     <label id="note-selector-label"></label>
-                    <button name="note-selector" id="note-selector" style="width: 110px; margin-right: 20px;" class="">~ G♯4 / A♭4</button>     
+                    <button style="display:none" name="note-selector" id="note-selector"  class=""></button>     
                     <button style="display:none" name="get-link" id="get-link">Get link</button>
                 </span>
             </div>

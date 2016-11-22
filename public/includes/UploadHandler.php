@@ -310,11 +310,15 @@ class UploadHandler
                 $this->get_upload_path($file_name)
             );
             $file->url = $this->get_download_url($file->name);
+
             foreach($this->options['image_versions'] as $version => $options) {
                 if (!empty($version)) {
-                    if (is_file($this->get_upload_path($file_name, $version))) {
+
+                    $filePath = $this->get_upload_path($file_name, $version);
+
+                    if (is_file($filePath) ) {
                         $file->{$version.'Url'} = $this->get_download_url(
-                            $file->name,
+                            $file_name,
                             $version
                         );
                     }
@@ -778,6 +782,7 @@ class UploadHandler
             $img_height
         ) && $write_func($new_img, $new_file_path, $image_quality);
         $this->gd_set_image_object($file_path, $new_img);
+
         return $success;
     }
 
@@ -1026,8 +1031,9 @@ class UploadHandler
         return $image_info && $image_info[0] && $image_info[1];
     }
 
-    protected function handle_image_file($file_path, $file) {
+    public function handle_image_file($file_path, $file) {
         $failed_versions = array();
+
         foreach($this->options['image_versions'] as $version => $options) {
             if ($this->create_scaled_image($file->name, $version, $options)) {
                 if (!empty($version)) {
@@ -1273,7 +1279,7 @@ class UploadHandler
     }
 
     public function get($print_response = true) {
-      
+       
 
         if ($print_response && isset($_GET['download'])) {
             return $this->download();
@@ -1376,12 +1382,11 @@ class UploadHandler
                 $this->options['param_name'] =>  $userFilesData
             );
         }
-
-
         return $this->generate_response($response, $print_response);
     }
 
     public function post($print_response = true) {
+
         if (isset($_REQUEST['_method']) && $_REQUEST['_method'] === 'DELETE') {
             return $this->delete($print_response);
         }
@@ -1420,7 +1425,7 @@ class UploadHandler
             $files[] = $this->handle_file_upload(
                 isset($upload['tmp_name']) ? $upload['tmp_name'] : null,
                 $file_name ? $file_name : (isset($upload['name']) ?
-                        $upload['name'] : null),
+                        str_replace(' ', '_', $upload['name']) : null),
                 $size ? $size : (isset($upload['size']) ?
                         $upload['size'] : $this->get_server_var('CONTENT_LENGTH')),
                 isset($upload['type']) ?

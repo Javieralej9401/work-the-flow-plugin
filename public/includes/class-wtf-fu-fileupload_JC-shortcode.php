@@ -9,6 +9,8 @@ require_once( plugin_dir_path(__FILE__) . '../../includes/class-wtf-fu-options.p
 require_once( plugin_dir_path(__FILE__) . '../../includes/wtf-fu-common-utils.php' );
 require_once( plugin_dir_path(__FILE__) . 'wtf-fu-templates.php' );
 require_once( plugin_dir_path(__FILE__) . 'wtf-fu-JC-templates.php' );
+require_once( plugin_dir_path(__FILE__) . 'UploadHandler.php' );
+
 
 
 /**
@@ -107,16 +109,13 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     */
     public function generateFileName($file_name = '', $newNamePrefix = '', $newNameSufix = '', $ext = null){
 
-
       // Nombre del archivo sin extension
       $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $file_name);
-
-   
          //Nuevo nombre temporal
       $newName = !$ext ? str_replace($withoutExt, $newNamePrefix.$withoutExt.$newNameSufix , $file_name)
                   :  $newNamePrefix.$withoutExt.$newNameSufix.$ext;     
-     
-
+      $newName = preg_replace('/\s+/', '_', $newName);
+      
       return $newName;
     }
 
@@ -157,7 +156,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     /*
     * Vaciar carpeta temporal
     */
-    public function emptyTmpFolder(){
+    public function clearTmpFolder(){
       $files = glob(self::getTempAudioPath(true).'/*');
       foreach($files as $file){
           if(is_file($file)) // si se trata de un archivo
@@ -193,7 +192,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       return $executedCommands;
     } 
 
-    public function registerFinalOutput($audioPath, $fileName){
+    public function registerFinalOutput($baseUrl, $fileName, $fileName2){
 
        global $wpdb;
 
@@ -210,15 +209,45 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                array(
                 'user_id' => $currentUser->ID,
                 'file_name' => $fileName,
-                'file_path' => $audioPath,
+                'file_path' => self::getUploadPath() . "/" . $fileName,
+                'processed' => 1,
+                )
+             );
+
+             $wpdb->insert( 
+               $tableName, 
+               array(
+                'user_id' => $currentUser->ID,
+                'file_name' => $fileName2,
+                'file_path' => self::getUploadPath() . "/" . $fileName2,
                 'processed' => 1,
                 )
              );
         }
 
-
     }
+    public static function createImgThumbnail($imgName){
 
+        $newFile = new stdClass();
+        $newFile->name =  $imgName;
+        $newFile->type =  "image/png";
+        $newFile->url =  self::getUploadPath(true).'/'. $imgName;
+       
+        $db_options = Wtf_Fu_Options::get_upload_options();
+        if ((wtf_fu_get_value($db_options, 'deny_public_uploads') == true) && !is_user_logged_in()) {
+            ob_end_clean();
+            die("<div class=\"alert\">Public upload access is not allowed. Please log in and try again.</div>");
+        }   
+       $options = $db_options;
+      // put in a fornat suitable for the UploadHandler.
+       $options = self::massageUploadHandlerOptions($options);
+       // Add in deny options from database AFTER we have processed form field options.
+       $options['deny_file_types'] = '/\.('. $db_options['deny_file_types'] . ')$/i';   
+       $uphand  = new UploadHandler($options, false);
+       $filePath =  self::getUploadPath(true).'/'. $imgName;
+       $uphand->handle_image_file($filePath, $newFile );
+       return true;
+    }
  /*
     * Función que se ejecuta para procesar los audios selecionados
     */
@@ -265,6 +294,15 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                                      $preProcessingData['leftEarSettingValue'].'-'.$preProcessingData['rightEarSettingValue'] // prefijo
                                      // '_sufijo' // Sufijo    
                               );
+        var_dump( $NOMBRE_AUDIO_FINAL);
+        die();
+        $NOMBRE_IMAGEN_FINAL =  self::generateFileName(
+                                      $preProcessingData['audioFileData']->file_name, //Nombre base
+                                      $preProcessingData['leftEarSettingValue'].'-'.$preProcessingData['rightEarSettingValue'], // prefijo
+                                      null,
+                                      '.png'
+                                 );
+
         // Aqui se debe guardar la ruta completa con el nombre del audio final  procesado.
         $RUTA_AUDIO_FINAL = $carpeta_audios_usuario.'/'. $NOMBRE_AUDIO_FINAL;
 
@@ -274,7 +312,6 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
             unlink(self::getUploadPath(true) . '/' . $NOMBRE_AUDIO_FINAL );
 
         }
-
 
         /*=============================================
         =      Estructura de la cola de comandos      =
@@ -289,18 +326,8 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
         /*===== Estructura de la cola de comandos ====*/
 
           //variables de Ejemplo
-        $out1 = $ruta_carpeta_temp.'/'. self::generateFileName(
-                                                              'out1',
-                                                              '',
-                                                              '',
-                                                              '.wav'
-                                                              );
-        $out2 = $ruta_carpeta_temp.'/'. self::generateFileName(
-                                                              'out2',
-                                                              '',
-                                                              '',
-                                                              '.wav'
-                                                               );
+        $out1 = $ruta_carpeta_temp.'/'. self::generateFileName( 'out1','','','.wav');
+        $out2 = $ruta_carpeta_temp.'/'. self::generateFileName('out2','','','.wav');
 
         $myCommandBatch = array(
               array(
@@ -363,12 +390,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 'commandTemplateArguments' => array(
                   $RUTA_AUDIO_FINAL, 
                   escapeshellarg("By SoBi Labs"), 
-                  self::getUploadPath(true).'/'.self::generateFileName(
-                            $preProcessingData['audioFileData']->file_name, //Nombre base
-                            $preProcessingData['leftEarSettingValue'].'-'.$preProcessingData['rightEarSettingValue'], // prefijo
-                             null,
-                             '.png'
-                      )
+                  $NOMBRE_IMAGEN_FINAL,
                 ) 
               ),
         );
@@ -376,18 +398,22 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
 
         //Simulando la ejecucion del comando final (crea un archivo .mp3 vacio)
          file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
+        // if(copy(self::getUploadPath(true).'/test/'."20161118_113744.png", 
+        //     self::getUploadPath(true).'/'. $NOMBRE_IMAGEN_FINAL));
+       
+        self::createImgThumbnail($NOMBRE_IMAGEN_FINAL);
 
         // Se ejecuta la cola de comandos
         $executedCommands = self::executeCommandBatch($myCommandBatch);
 
         // Vaciando la carpeta temporal
-     //   self::emptyTmpFolder();
+         self::clearTmpFolder();
  
         /**
          * Se registra el audio final en la tabla, verificando de que existe el audio generado
          * por la cola de comandos.
          */
-        self::registerFinalOutput(self::getUploadPath() . '/' . $NOMBRE_AUDIO_FINAL , $NOMBRE_AUDIO_FINAL);
+        self::registerFinalOutput(self::getUploadPath(), $NOMBRE_AUDIO_FINAL, $NOMBRE_IMAGEN_FINAL);
 
         // var_dump($executedCommands);
         /* 
