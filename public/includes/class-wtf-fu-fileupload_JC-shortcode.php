@@ -115,7 +115,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       $newName = !$ext ? str_replace($withoutExt, $newNamePrefix.$withoutExt.$newNameSufix , $file_name)
                   :  $newNamePrefix.$withoutExt.$newNameSufix.$ext;     
       $newName = preg_replace('/\s+/', '_', $newName);
-      
+
       return $newName;
     }
 
@@ -294,8 +294,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                                      $preProcessingData['leftEarSettingValue'].'-'.$preProcessingData['rightEarSettingValue'] // prefijo
                                      // '_sufijo' // Sufijo    
                               );
-        var_dump( $NOMBRE_AUDIO_FINAL);
-        die();
+       
         $NOMBRE_IMAGEN_FINAL =  self::generateFileName(
                                       $preProcessingData['audioFileData']->file_name, //Nombre base
                                       $preProcessingData['leftEarSettingValue'].'-'.$preProcessingData['rightEarSettingValue'], // prefijo
@@ -397,7 +396,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
 
 
         //Simulando la ejecucion del comando final (crea un archivo .mp3 vacio)
-         file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
+        // file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
         // if(copy(self::getUploadPath(true).'/test/'."20161118_113744.png", 
         //     self::getUploadPath(true).'/'. $NOMBRE_IMAGEN_FINAL));
        
