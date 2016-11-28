@@ -94,6 +94,9 @@ class Wtf_Fu {
         add_action('wp_ajax_load_ajax_function', array($this, 'wtf_fu_load_ajax_function'));
         add_action('wp_ajax_nopriv_load_ajax_function', array($this, 'wtf_fu_load_ajax_function'));
 
+        add_action('wp_ajax_load_JC_ajax_function', array($this, 'wtf_fu_load_JC_ajax_function'));
+        add_action('wp_ajax_nopriv_load_JC_ajax_function', array($this, 'wtf_fu_load_JC_ajax_function'));
+
         add_action('wp_ajax_audio_load_ajax_function', array($this, 'wtf_fu_audio_load_ajax_function'));
         add_action('wp_ajax_nopriv_audio_load_ajax_function', array($this, 'wtf_fu_audio_load_ajax_function'));
 
@@ -204,6 +207,8 @@ class Wtf_Fu {
               file_name text NOT NULL DEFAULT '',
               file_path text NOT NULL DEFAULT '',
               processed tinyint NOT NULL DEFAULT 0,
+              globalaudio tinyint NOT NULL DEFAULT 0,
+              type  VARCHAR(50) NOT NULL DEFAULT 'audio',
               PRIMARY KEY (ID)
             );"
           );
@@ -616,6 +621,10 @@ class Wtf_Fu {
      */
     function wtf_fu_load_ajax_function() {
         Wtf_Fu_Fileupload_Shortcode::wtf_fu_load_ajax_function();
+    }
+
+    function wtf_fu_load_JC_ajax_function() {
+        Wtf_Fu_Fileupload_JC_Shortcode::wtf_fu_load_ajax_function();
     }
     
     function wtf_fu_audio_load_ajax_function() {

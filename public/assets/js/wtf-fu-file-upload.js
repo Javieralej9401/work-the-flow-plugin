@@ -1,9 +1,6 @@
 
 function wtf_file_upload_init($, el) {
     
-   
-
-    
     if ($(el).length === 0) {
         return; // nothing to do.
     } 
@@ -47,12 +44,6 @@ function wtf_file_upload_init($, el) {
 
         $(this).fileupload('option', 'done')
             .call(this, $.Event('done'), {result: result});
-
-        // var $tbody = $(this).find(".files");
-
-        // result.files.map(function(e, i){
-        //         console.log(e);
-        // })
 
     });    
 

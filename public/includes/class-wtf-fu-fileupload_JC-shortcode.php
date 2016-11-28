@@ -35,7 +35,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       $form_vars = '';
 
             // Add the ajax handler action for jQuery to our options.
-      $options['action'] = 'load_ajax_function';
+      $options['action'] = 'load_JC_ajax_function';
 
             // 
             // Put unmassaged options into POST vars for subsequent posts of 
@@ -64,6 +64,48 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       return ($html);
     }
 
+    public static function wtf_fu_load_ajax_function(){
+           
+//        log_me(array("ajax handler REQUEST:" => $_REQUEST));        
+//        check_ajax_referer( 'wtf_fu_upload_nonce', 'security' );
+        ob_start();
+      
+        // Get the option defaults.
+        $db_options = Wtf_Fu_Options::get_upload_options();
+
+        if ((wtf_fu_get_value($db_options, 'deny_public_uploads') == true) && !is_user_logged_in()) {
+            ob_end_clean();
+            die("<div class=\"alert\">Public upload access is not allowed. Please log in and try again.</div>");
+        }   
+           
+        $options = $db_options;
+        
+        // Overwrite defaults with options set by the request.
+        foreach (array_keys($options) as $k) {
+            if (isset($_REQUEST[$k])) {
+                $options[$k] = $_REQUEST[$k];
+            }
+        }
+
+        // put in a fornat suitable for the UploadHandler.
+        $options = self::massageUploadHandlerOptions($options);
+        
+        // Add in deny options from database AFTER we have processed form field options.
+        $options['deny_file_types'] = '/\.('. $db_options['deny_file_types'] . ')$/i';   
+
+        // Include the upload handler.
+        require_once('UploadHandler.php');
+
+        error_reporting(E_ALL | E_STRICT);
+       
+        ob_end_clean(); // Discard any warnings output.
+        $options =  $options + array("wtf-jc-audios" =>  true);
+        $upload_handler = new UploadHandler($options);
+
+        die(); // always exit after an ajax call.
+    }
+
+
     public static function getAudioFileData($id){
 
       global $wpdb;
@@ -82,7 +124,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     /**
      * Función que retorna los intervalos de frecuencia para ambos oidos
      */
-    public function getFrequencyIntervals($baseRightEar,$baseLeftEar){
+    public static function getFrequencyIntervals($baseRightEar,$baseLeftEar){
         $leftEarStep = $rightEarStep = 500; // constante para ambos oidos.
 
         $rightBottom = $baseRightEar-$rightEarStep;
@@ -102,12 +144,12 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                                   'top' => $leftTop //Alta
                                   )
           );
-      }
+    }
 
     /*
     * Función que genera un nombre de archivo manteniendo la extension.
     */
-    public function generateFileName($file_name = '', $newNamePrefix = '', $newNameSufix = '', $ext = null){
+    public static function generateFileName($file_name = '', $newNamePrefix = '', $newNameSufix = '', $ext = null){
 
       // Nombre del archivo sin extension
       $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $file_name);
@@ -123,7 +165,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     * Función que retorna la ruta de los archivos subidos por el usuario
     * Usar esta ruta en el comando final y el archivo procesado pueda ser visto.
     */
-    public function getUploadPath($absolute = false) {
+    public static function getUploadPath($absolute = false) {
       $pluginOptions = Wtf_Fu_Options::get_upload_options();
       $return = wtf_fu_get_user_upload_paths(
         $pluginOptions['wtf_upload_dir'], 
@@ -139,7 +181,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     /**
      * Función que retorna la ruta temporal del archivo (preprocesamiento)
      */
-    public function getTempAudioPath($absolute = false){
+    public static function getTempAudioPath($absolute = false){
 
       $uploadPath = self::getUploadPath($absolute);
       $tempFolderName = 'tmp';
@@ -156,7 +198,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
     /*
     * Vaciar carpeta temporal
     */
-    public function clearTmpFolder(){
+    public static function clearTmpFolder(){
       $files = glob(self::getTempAudioPath(true).'/*');
       foreach($files as $file){
           if(is_file($file)) // si se trata de un archivo
@@ -164,7 +206,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       }
     }
 
-    public function executeCommandBatch($commands){
+    public static function executeCommandBatch($commands){
 
       $executedCommands = array();
 
@@ -192,7 +234,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
       return $executedCommands;
     } 
 
-    public function registerFinalOutput($baseUrl, $fileName, $fileName2){
+    public static function registerFinalOutput($baseUrl, $fileName, $fileName2){
 
        global $wpdb;
 
@@ -221,6 +263,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 'file_name' => $fileName2,
                 'file_path' => self::getUploadPath() . "/" . $fileName2,
                 'processed' => 1,
+                'type' => "image"
                 )
              );
         }
@@ -232,21 +275,27 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
         $newFile->name =  $imgName;
         $newFile->type =  "image/png";
         $newFile->url =  self::getUploadPath(true).'/'. $imgName;
-       
-        $db_options = Wtf_Fu_Options::get_upload_options();
-        if ((wtf_fu_get_value($db_options, 'deny_public_uploads') == true) && !is_user_logged_in()) {
-            ob_end_clean();
-            die("<div class=\"alert\">Public upload access is not allowed. Please log in and try again.</div>");
-        }   
-       $options = $db_options;
-      // put in a fornat suitable for the UploadHandler.
-       $options = self::massageUploadHandlerOptions($options);
-       // Add in deny options from database AFTER we have processed form field options.
-       $options['deny_file_types'] = '/\.('. $db_options['deny_file_types'] . ')$/i';   
-       $uphand  = new UploadHandler($options, false);
-       $filePath =  self::getUploadPath(true).'/'. $imgName;
-       $uphand->handle_image_file($filePath, $newFile );
-       return true;
+
+        if(file_exists($newFile->url)){
+
+            $db_options = Wtf_Fu_Options::get_upload_options();
+            if ((wtf_fu_get_value($db_options, 'deny_public_uploads') == true) && !is_user_logged_in()) {
+                ob_end_clean();
+                die("<div class=\"alert\">Public upload access is not allowed. Please log in and try again.</div>");
+            }   
+           $options = $db_options;
+           // put in a fornat suitable for the UploadHandler.
+           $options = self::massageUploadHandlerOptions($options);
+           // Add in deny options from database AFTER we have processed form field options.
+           $options['deny_file_types'] = '/\.('. $db_options['deny_file_types'] . ')$/i';   
+           
+           $uphand  = new UploadHandler($options, false);
+           $filePath =  self::getUploadPath(true).'/'. $imgName;
+           $uphand->handle_image_file($filePath, $newFile );
+      
+        }
+
+        return true;
     }
  /*
     * Función que se ejecuta para procesar los audios selecionados
@@ -263,7 +312,7 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
           // Se busca la data del audio seleccionado del usuario
         $audioFileData = self::getAudioFileData($selectedAudioId);
 
-        if(!audioFileData){
+        if(!$audioFileData){
           throw new Exception("No fue posible encontrar el registro", 1);
           return;
         }
@@ -389,24 +438,23 @@ class Wtf_Fu_Fileupload_JC_Shortcode extends Wtf_Fu_Fileupload_Shortcode {
                 'commandTemplateArguments' => array(
                   $RUTA_AUDIO_FINAL, 
                   escapeshellarg("By SoBi Labs"), 
-                  $NOMBRE_IMAGEN_FINAL,
+                  $carpeta_audios_usuario.'/'. $NOMBRE_IMAGEN_FINAL,
                 ) 
               ),
         );
 
 
         //Simulando la ejecucion del comando final (crea un archivo .mp3 vacio)
-        // file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
-        // if(copy(self::getUploadPath(true).'/test/'."20161118_113744.png", 
-        //     self::getUploadPath(true).'/'. $NOMBRE_IMAGEN_FINAL));
+        /* file_put_contents(self::getUploadPath(true).'/'. $NOMBRE_AUDIO_FINAL, '' );
+         if(copy(self::getUploadPath(true).'/test/'."20161118_113744.png", 
+             self::getUploadPath(true).'/'. $NOMBRE_IMAGEN_FINAL));*/
        
-        self::createImgThumbnail($NOMBRE_IMAGEN_FINAL);
-
         // Se ejecuta la cola de comandos
         $executedCommands = self::executeCommandBatch($myCommandBatch);
+        self::createImgThumbnail($NOMBRE_IMAGEN_FINAL);
 
         // Vaciando la carpeta temporal
-         self::clearTmpFolder();
+        self::clearTmpFolder();
  
         /**
          * Se registra el audio final en la tabla, verificando de que existe el audio generado

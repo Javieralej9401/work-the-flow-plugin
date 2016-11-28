@@ -212,18 +212,22 @@ class UploadHandler
         return '';
     }
 
-    protected function get_upload_path($file_name = null, $version = null) {
+    protected function get_upload_path($file_name = null, $version = null, $uploadPath = '') {
         $file_name = $file_name ? $file_name : '';
         if (empty($version)) {
             $version_path = '';
         } else {
             $version_dir = @$this->options['image_versions'][$version]['upload_dir'];
+           
             if ($version_dir) {
                 return $version_dir.$this->get_user_path().$file_name;
             }
             $version_path = $version.'/';
         }
-        return $this->options['upload_dir'].$this->get_user_path()
+        $uploadDir =  $uploadPath ? $uploadPath : $this->options['upload_dir'];
+
+
+        return $uploadDir."/".$this->get_user_path()
             .$version_path.$file_name;
     }
 
@@ -231,8 +235,9 @@ class UploadHandler
         return strpos($url, '?') === false ? '?' : '&';
     }
 
-    protected function get_download_url($file_name, $version = null, $direct = false) {
+    protected function get_download_url($file_name, $version = null, $direct = false, $path = "") {
         if (!$direct && $this->options['download_via_php']) {
+
             $url = $this->options['script_url']
                 .$this->get_query_separator($this->options['script_url'])
                 .'file='.rawurlencode($file_name);
@@ -245,12 +250,19 @@ class UploadHandler
             $version_path = '';
         } else {
             $version_url = @$this->options['image_versions'][$version]['upload_url'];
+            
             if ($version_url) {
                 return $version_url.$this->get_user_path().rawurlencode($file_name);
             }
             $version_path = rawurlencode($version).'/';
         }
-        return $this->options['upload_url'].$this->get_user_path()
+
+        $uploadPath =  $path!== "" ? $path :  $this->options['upload_url'];
+        
+        $uploadPath = str_replace(wp_upload_dir()["basedir"], 
+                            wp_upload_dir()["baseurl"] ,  $uploadPath);
+
+        return $uploadPath."/".$this->get_user_path()
             .$version_path.rawurlencode($file_name);
     }
 
@@ -294,32 +306,38 @@ class UploadHandler
 
     }
 
-    protected function is_valid_file_object($file_name) {
-        $file_path = $this->get_upload_path($file_name);
+    protected function is_valid_file_object($file_name, $path =  "") {
+        $file_path =   $path !== "" ?  $path . "/". $file_name
+                                    : $this->get_upload_path($file_name);
         if (is_file($file_path) && $file_name[0] !== '.') {
             return true;
         }
         return false;
     }
 
-    protected function get_file_object($file_name) {
-        if ($this->is_valid_file_object($file_name)) {
+    protected function get_file_object($file_name, $path = '') {
+
+        if ($this->is_valid_file_object($file_name, $path)) {
             $file = new stdClass();
             $file->name = $file_name;
+
             $file->size = $this->get_file_size(
-                $this->get_upload_path($file_name)
+                 $this->get_upload_path($file_name, null, $path)
             );
-            $file->url = $this->get_download_url($file->name);
+
+            $file->url = $this->get_download_url($file->name, null, false, $path);
 
             foreach($this->options['image_versions'] as $version => $options) {
                 if (!empty($version)) {
 
-                    $filePath = $this->get_upload_path($file_name, $version);
+                    $filePath = $this->get_upload_path($file_name, $version, $path);
 
                     if (is_file($filePath) ) {
                         $file->{$version.'Url'} = $this->get_download_url(
                             $file_name,
-                            $version
+                            $version,
+                            false,
+                            $path
                         );
                     }
                 }
@@ -336,15 +354,39 @@ class UploadHandler
      * callback to sort the scandir results in timestamp order.
      * @param type $filename
      */
-    protected function wtf_fu_sort_files($filename) {       
-        $fq_file = $this->get_upload_path() . '/' . $filename;
+    protected function wtf_fu_sort_files($filename, $path = '') { 
+        $basePath = $path ? $path : $this->get_upload_path();
+        $fq_file =  $basePath  . '/' . $filename;
         $ret = filemtime($fq_file);       
         return $ret;
     }
-    
+   
+    protected function get_main_audio_objects($path = ''){
 
+        $upload_dir =   $path;
+        if (!is_dir($upload_dir)) {
+            return array();
+        }
+        
+        $scan = scandir($upload_dir);
+     
+        $mapped = array_map(function($filename) use($path){
+            return self::wtf_fu_sort_files($filename, $path);
+        } , $scan);
+      
+        array_multisort( $mapped,  SORT_NUMERIC, SORT_ASC, $scan);      
+        
+        $globalAudios =  array_values(array_filter(array_map(
+            function($filename) use ($path){
+                 return self::get_file_object($filename, $path);
+            } ,
+            $scan)));
+
+        return $globalAudios;
+    }
     protected function get_file_objects($iteration_method = 'get_file_object') {
-        $upload_dir = $this->get_upload_path();
+        $upload_dir =   $this->get_upload_path() ;
+
         if (!is_dir($upload_dir)) {
             return array();
         }
@@ -1278,6 +1320,27 @@ class UploadHandler
         $this->send_content_type_header();
     }
 
+    public function findInQueryResult($queryRs, $key){
+         /* Se encuentra el match en los registros de BD con el nombre del archivo
+          (Unico por carpeta de usuario)
+        */
+        $foundRow = null;
+
+        foreach ($queryRs as $row) {
+             
+            $array_values = array_values(json_decode(json_encode($row), true));
+
+            $k = array_search($key , $array_values);
+          
+            if($k){
+                $foundRow = $row;
+                break; 
+            }
+        }
+
+        return $foundRow;
+    }
+
     public function get($print_response = true) {
        
 
@@ -1292,76 +1355,84 @@ class UploadHandler
             $sqlFilter= ' AND file_name = "'. addslashes($file_name) .'"';
         }
 
-        $audioFilterOptions = array('processed' => 1, 'no-processed' => 0);
+        $audioFilterOptions = array(
+                                    'processed' =>  array("processed" => 1),
+                                    'global-audio' => array("globalaudio" => 1)
+                              );
         $audioFilterKey =  array_key_exists ('audioFilter', $this->options) ? 
                                 $this->options['audioFilter'] 
                             : '';
+        $processedAudioFilter = null;
+        if(array_key_exists($audioFilterKey , $audioFilterOptions)){
+             $processedAudioFilter = $audioFilterOptions[$audioFilterKey];  
+        }
 
-        $processedAudioFilter = $audioFilterOptions[$audioFilterKey];
         // flag para identificar si hay algun filtro sobre los archivos,
         $filterFilesData = !is_null($processedAudioFilter);
 
-        $sqlFilter .=  $filterFilesData  ? 
-                        " AND processed = " . $processedAudioFilter 
-                        : "";
-        
+        if($filterFilesData){
+            foreach ($processedAudioFilter as $key => $value) {
+                $sqlFilter.= " AND " . $key . " = '". $value. "'";
+            }
+        }
         // Json de los archivos del usuario
         $userFilesData = !$file_name ?  $this->get_file_objects() 
                          : [$this->get_file_object($file_name)];
+      
+        if( array_key_exists ('globalAudioPath', $this->options)){
+
+            $globalAudioPath = $this->options["globalAudioPath"];
+            $userFilesData  = self::get_main_audio_objects($globalAudioPath);
+
+        }
 
         // Se busca los ids de los audios desde BD y hacer merge con los archivos 
         global $wpdb;
         $currentUser = wp_get_current_user();
         $tableName = $wpdb->prefix . "user_audio_files";
-        $queryRs = $wpdb->get_results( "SELECT ID, file_name, processed 
+        $queryRs = $wpdb->get_results( "SELECT ID, file_name, processed, type 
                                         FROM $tableName 
                                         WHERE user_id = ". $currentUser->ID 
                                         . ' ' . $sqlFilter);
 
-        
-
         // Se le asigna el id de los archivos.
         foreach ($userFilesData as $key => $data) {
+
             $processed = false;
+            $type = $this->onlyAudioAccepted() ? "audio" : "";
             $foundId = -1;
-            /* Se encuentra el match en los registros de BD con el nombre del archivo
-              (Unico por carpeta de usuario)
-            */
-            foreach ($queryRs as $row) {
-                 
-                $array_values = array_values(json_decode(json_encode($row), true));
+            $foundRow = $this->findInQueryResult($queryRs, $data->name);
 
-                $k = array_search($data->name , $array_values);
-              
-                if($k){
-                    $foundId = $row->ID;
-                    $processed = $row->processed;
-                    break;
+             if($foundRow){
+
+                $foundId = $foundRow->ID;
+                $processed = $foundRow->processed;
+                $type =  $foundRow->type;
+
+             }else {
+
+                $newRow =  array(
+                    'user_id' => $currentUser->ID,
+                    'file_name' => $data->name,
+                    'file_path' => $data->url,
+                    'type' => $type
+                );
+
+                if($filterFilesData){
+                    $newRow  = array_merge($newRow, $processedAudioFilter);
                 }
-            }
+             
+                $wpdb->insert( 
+                     $tableName, 
+                     $newRow
+                );
 
-            // Si archivos no estan filtrados, es porque no existen
-            if(!$filterFilesData){
-                // Si no encontro un match en la BD, se inserta y se obtiene el ID 
-                // correspondiente
-                if($foundId === -1){
+                $foundId = $wpdb->insert_id;
 
-                    $wpdb->insert( 
-                             $tableName, 
-                             array(
-                                'user_id' => $currentUser->ID,
-                                'file_name' => $data->name,
-                                'file_path' => $data->url
-                             )
-                    );
-
-                    $foundId = $wpdb->insert_id;
-                }
-
-            }
-         
-            $userFilesData[$key]->id = $foundId;
-            $userFilesData[$key]->processed = (int) $processed;
+             }
+             $userFilesData[$key]->id = $foundId;
+             $userFilesData[$key]->processed = (int) $processed;
+             $userFilesData[$key]->type = $type;
 
         }
         
@@ -1384,7 +1455,14 @@ class UploadHandler
         }
         return $this->generate_response($response, $print_response);
     }
-
+    public function onlyAudioAccepted(){
+        if( array_key_exists("wtf-jc-audios", $this->options) ){
+            if($this->options["wtf-jc-audios"]){
+                return true;
+            }
+        }
+        return false;
+    }
     public function post($print_response = true) {
 
         if (isset($_REQUEST['_method']) && $_REQUEST['_method'] === 'DELETE') {
@@ -1440,8 +1518,14 @@ class UploadHandler
        try {
 
             $ids = $this->DBInsertAudioFilesData($files);
+
+            $isAudioFile = $this->onlyAudioAccepted();
+            
             foreach ($files as $key => $value) {
                 $files[$key]->id = $ids[$key];
+                if( $isAudioFile){
+                    $files[$key]->type = "audio";
+                }
             }
 
        } catch (\Exception $e) {

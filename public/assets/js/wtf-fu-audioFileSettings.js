@@ -15,8 +15,9 @@ var JC_AudioSettings = (function($){
        loadingStateView:  '.loadingStateContainer'
     }
 
-    var getSelectedAudiosData = function(){
-        var $selectedAudioRows = $(viewNames.audioTableRow).find("input:radio:checked");
+    var getSelectedAudiosData = function($form){
+        var $selectedAudioRows = $form.find(viewNames.audioTableRow)
+                                       .find("input:radio:checked");
       
         return $selectedAudioRows.map(function(i, e){
             var $row = $(e).closest('tr');
@@ -31,9 +32,9 @@ var JC_AudioSettings = (function($){
      * 
      */
     
-    var anyAudioFileSelected = function(){
+    var anyAudioFileSelected = function($mainForm){
 
-        var selectedAudioRows  = getSelectedAudiosData();
+        var selectedAudioRows  = getSelectedAudiosData($mainForm);
         return  selectedAudioRows.length > 0
     }
 
@@ -43,10 +44,11 @@ var JC_AudioSettings = (function($){
      *
      */
     
-    var getAudioSettingsData = function(){
+    var getAudioSettingsData = function($mainForm){
 
-        var $leftEarInput = $(viewNames.audioSettingsViewContainer).find('.l_input');
-        var $rightEarInput = $(viewNames.audioSettingsViewContainer).find('.r_input');
+        var $audioSettingsViewContainer = $mainForm.find(viewNames.audioSettingsViewContainer);
+        var $leftEarInput = $audioSettingsViewContainer.find('.l_input');
+        var $rightEarInput = $audioSettingsViewContainer.find('.r_input');
 
         return {
             leftEar: $leftEarInput.val().trim() || "",
@@ -60,10 +62,10 @@ var JC_AudioSettings = (function($){
      * Guarda y aplica los cambios realizados a los audios seleccionados
      *
      */
-    var applySettings = function(form){
+    var applySettings = function(form, fn){
 
-        var audioSettings = getAudioSettingsData();
-        var selectedAudioRows  = getSelectedAudiosData();
+        var audioSettings = getAudioSettingsData(form);
+        var selectedAudioRows  = getSelectedAudiosData(form);
         var selectedAudioId = selectedAudioRows[0];
 
         $.ajax({
@@ -81,20 +83,8 @@ var JC_AudioSettings = (function($){
             }
         })
         .done(function(result) {
-  
-            $(viewNames.loadingStateView).removeClass("show");
-            var audioNames = result.audioData.map(function(index, elem) {
-                return index['file_name'];
-            }).join();
-
-            resetSelectedAudios();
-
-            form.find(".files").html('');
-            wtf_file_upload_init($,  form);
-
-            if(result.debug){
-                showMessage({title: 'Audios procesados', msg: result.executedCommands.join('\n\n') })
-            }
+            fn(result);
+           
             
         })
         .fail(function() {
@@ -110,11 +100,11 @@ var JC_AudioSettings = (function($){
      *
      */
     
-    var resetSelectedAudios = function(){
+    var resetSelectedAudios = function($form){
 
-        $(viewNames.fileUploadForm).find('input:radio').removeAttr('checked');
+        $form.find('input:radio').removeAttr('checked');
        // $(viewNames.audioSettingsViewContainer).find('input').val('0');
-        $(viewNames.processAudioSettingsBtn).attr('disabled', 'disabled');
+        $form.find(viewNames.processAudioSettingsBtn).attr('disabled', 'disabled');
 
     }
 
@@ -134,10 +124,12 @@ var JC_AudioSettings = (function($){
         
         $(viewNames.processAudioSettingsBtn).on('click', function(e){
             e.preventDefault();
+            
+            $mainForm =  $(this).closest("form");
 
-            if(anyAudioFileSelected()){
+            if(anyAudioFileSelected($mainForm)){
 
-                var audioSettings = getAudioSettingsData();
+                var audioSettings = getAudioSettingsData($mainForm);
 
                 if( audioSettings.leftEar === '' 
                     && audioSettings.rightEar === ''){
@@ -146,12 +138,31 @@ var JC_AudioSettings = (function($){
                 }
 
                 //Busca el la tabla de audios procesados o la tabla para mostrar todos.
-                $processedClosestForm =   $(viewNames.fileUploadForm).filter(function() {
+                $processedForms =   $(viewNames.fileUploadForm).filter(function() {
                                             return $.inArray($(this).data("audio-filter"), 
                                                     ["", "processed"]) > -1;
                                           });
 
-                applySettings($processedClosestForm);
+                $processedClosestForm = $(this).closest(viewNames.fileUploadForm);
+
+                applySettings($processedClosestForm,  function(result){
+                    $(viewNames.loadingStateView).removeClass("show");
+                    var audioNames = result.audioData.map(function(index, elem) {
+                        return index['file_name'];
+                    }).join();
+
+                    resetSelectedAudios($processedClosestForm);
+
+                    $processedForms.find(".files").html('');
+
+                    $processedForms.each(function(index, el) {
+                         wtf_file_upload_init($,   el);
+                    });
+                    
+                    if(result.debug){
+                        showMessage({title: 'Audios procesados', msg: result.executedCommands.join('\n\n') })
+                    }
+                });
               
             }else{
                 showMessage({title: 'Ningún audio seleccionado', msg: 'Por favor selecciona al menos un audio de la lista.'})
@@ -161,17 +172,19 @@ var JC_AudioSettings = (function($){
 
         $(viewNames.fileUploadForm).on('change', '.files input:radio', function(){
 
-            if(!anyAudioFileSelected()){
+            $mainForm = $(this).closest("form");
+            $processAudioSettingsBtn = $mainForm.find(viewNames.processAudioSettingsBtn);
 
-                $(viewNames.processAudioSettingsBtn).attr({
-                                                            'disabled' : 'disabled',
-                                                            'title': 'Selecciona al menos un archivo de audio de la lista'
-                                                          })
+            if(!anyAudioFileSelected($mainForm)){
+
+                $processAudioSettingsBtn.attr({
+                                                'disabled' : 'disabled',
+                                                'title': 'Selecciona al menos un archivo de audio de la lista'
+                                              })
 
             }else{
-                $(viewNames.processAudioSettingsBtn)
-                           .removeAttr('disabled')
-                           .removeAttr('title');
+                $processAudioSettingsBtn.removeAttr('disabled')
+                                        .removeAttr('title');
             }
 
         })

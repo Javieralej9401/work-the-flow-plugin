@@ -52,7 +52,7 @@ class Wtf_Fu_ShowProcessedAudios_JC_Shortcode  extends Wtf_Fu_Fileupload_JC_Shor
 
       $html = getProcessAudioForm($action_href, $form_vars, "processed_audiosForm", "processed", true, false, "processedAudioTmp")
       . getGalleryWidgetTemplate()
-     // . getUploadJSTemplate_JC(true, false)
+      . getUploadJSTemplate_JC(true, false)
       . getDownloadJSTemplate_JC(true, false, "processedAudioTmp", true);
    
        return ($html);
@@ -92,6 +92,7 @@ class Wtf_Fu_ShowProcessedAudios_JC_Shortcode  extends Wtf_Fu_Fileupload_JC_Shor
         error_reporting(E_ALL | E_STRICT);
        
         ob_end_clean(); // Discard any warnings output.
+        $options =  $options + array("wtf-jc-audios" =>  true);
         $options =  $options + array("audioFilter" => 'processed');
         $upload_handler = new UploadHandler($options);
 

@@ -147,6 +147,9 @@ li.list p.pad_top_20px {
 }
 .right-panel-container input {
     max-height: 30px;
+    height: 30px;
+    padding: 0px !important;
+    padding-left: 0.625em !important;
 }
 .flex-container.right-valign{
     justify-content: flex-end;
@@ -171,7 +174,6 @@ li.list p.pad_top_20px {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
 }
 
 .btn{
@@ -279,8 +281,9 @@ li.list p.pad_top_20px {
 }
 .freqGenContainer .ui-widget-header{
     color: #ffffff !important;
-    background: #999999 !important;
-    border-color: inherit !important;
+    background: #999 !important;
+    border-color: #666 !important;
+    
 }
 .freqGenContainer #volume-slider {
   display: inline-block;
@@ -391,8 +394,25 @@ li.list p.pad_top_20px {
 .freqGenContainer .control-group {
     display: inline-block;
 }
+#freq-readout{
+    font-size: 26px;
+    font-weight: bolder;
+    color: #007acc;
+}
 
-
+/* .freqGenContainer button {
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+.freqGenContainer button:hover, 
+.freqGenContainer button:active, 
+.freqGenContainer button:focus,
+.freqGenContainer button:visited{
+    color: #ffffff;
+    background-color: #39b3d7;
+    border-color: #269abc;
+}
+ */
 @media only screen and (max-height: 600px) {
   .freqGenContainer #note-selector-panel {
     top: 2%;

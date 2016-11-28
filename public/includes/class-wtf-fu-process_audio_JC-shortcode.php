@@ -93,7 +93,16 @@ class Wtf_Fu_ProcessAudio_JC_Shortcode extends Wtf_Fu_Fileupload_JC_Shortcode {
         error_reporting(E_ALL | E_STRICT);
         
         ob_end_clean(); // Discard any warnings output.
-        $options =  $options + array("audioFilter" => 'no-processed');
+        $options =  $options + array("wtf-jc-audios" =>  true);
+        $options =  $options + array("audioFilter" => 'global-audio');
+        $audiosDir = wp_upload_dir()["basedir"] . "/sonidos";
+       
+        if(!file_exists($audiosDir)){
+            mkdir($audiosDir, 0755, true);
+        }
+
+        $options =  $options + array("globalAudioPath" =>  $audiosDir);
+
         $upload_handler = new UploadHandler($options);
 
         die(); // always exit after an ajax call.
